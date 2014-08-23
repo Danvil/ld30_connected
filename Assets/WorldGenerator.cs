@@ -3,13 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-public class WorldGenerator
+public class WorldVoxelGenerator
 {
 	SLPerlinNoise.PerlinNoise3D perlin;
 
 	Voxels.Voxel vAir, vWater, vLand;
 		
-	public WorldGenerator()
+	public WorldVoxelGenerator()
 	{
 		perlin = new SLPerlinNoise.PerlinNoise3D(0);
 		vAir = Voxels.Voxel.Empty;

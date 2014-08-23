@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 public static class MathTools
 {
@@ -21,5 +22,79 @@ public static class MathTools
 	public static Vector3 CoeffMult(this Vector3 a, Vector3 b)
 	{
 		return new Vector3(a.x*b.x, a.y*b.y, a.z*b.z);
+	}
+
+	static System.Random random = new System.Random();
+
+	public static int RandomIndex(int num)
+	{
+		return random.Next(num);
+	}
+
+	public static float Random(float a, float b)
+	{
+		return a + (b - a)*UnityEngine.Random.value;
+	}
+
+	public static void ShuffleInplace<T>(this List<T> array)
+	{
+		int n = array.Count;
+		while (n > 1)
+		{
+			n--;
+			int i = random.Next(n + 1);
+			T temp = array[i];
+			array[i] = array[n];
+			array[n] = temp;
+		}
+	}
+
+	public static IEnumerable<T> Shuffle<T>(this List<T> array)
+	{
+		List<int> indices = Enumerable.Range(0, array.Count).ToList();
+		indices.ShuffleInplace();
+		for(int i=0; i<array.Count; i++) {
+			yield return array[indices[i]];
+		}
+	}
+
+	public static T RandomSample<T>(this List<T> v)
+	{
+		int n = v.Count;
+		if(n == 0) {
+			// error
+			Debug.Log("ERROR in RandomSample");
+		}
+		return v[RandomIndex(n)];
+	}
+
+	public static T RandomSample<T>(this IEnumerable<T> v)
+	{
+		return RandomSample(v.ToList());
+	}
+
+	static IEnumerable<T> RandomSampleImpl<T>(this List<T> v, int n)
+	{
+		int max = v.Count;
+		if(n > max) {
+			// error
+			Debug.Log("ERROR in RandomSample");
+		}
+		return v.Shuffle().Take(n);
+	}
+
+	public static IEnumerable<T> RandomSample<T>(this List<T> v, int n)
+	{
+		if(n == 1) {
+			return new T[] { RandomSample(v) };
+		}
+		else {
+			return RandomSampleImpl(v,n);
+		}
+	}
+
+	public static IEnumerable<T> RandomSample<T>(this IEnumerable<T> v, int n)
+	{
+		return RandomSample(v.ToList(), n);
 	}
 }

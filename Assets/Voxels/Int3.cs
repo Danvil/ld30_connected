@@ -1,5 +1,11 @@
 using UnityEngine;
 
+public static class Int3Helper
+{
+	public static Int3 ToInt3(this Vector3 v)
+	{ return new Int3(v); }
+}
+
 public struct Int3
 {
 	public int x, y, z;
@@ -10,6 +16,31 @@ public struct Int3
 		this.y = y;
 		this.z = z;
 	}
+
+	public Int3(Vector3 v)
+	{
+		this.x = (int)v.x;
+		this.y = (int)v.z;
+		this.z = (int)v.y;
+	}
+
+	public Int2 xy
+	{
+		get{ return new Int2(x,y); }
+		set{ x = value.x; y = value.y; }
+	}
+
+	public Vector3 ToVector3()
+	{ return new Vector3(x,z,y); }
+
+	public override string ToString ()
+	{ return string.Format ("[Int3 ({0},{1},{2})]", x, y, z); }
+
+	public Int3 Min(Int3 v)
+	{ return new Int3(Mathf.Min(x,v.x), Mathf.Min(y,v.y), Mathf.Min(z,v.z)); }
+
+	public Int3 Max(Int3 v)
+	{ return new Int3(Mathf.Max(x,v.x), Mathf.Max(y,v.y), Mathf.Max(z,v.z)); }
 
 	public static Int3 Zero = new Int3(0,0,0);
 	public static Int3 X = new Int3(1,0,0);

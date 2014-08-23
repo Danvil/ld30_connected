@@ -28,7 +28,9 @@ namespace Voxels {
 		Int3 pos;
 
 		List<Voxel> voxels;
-		
+
+		HashSet<Int3> solidVoxels = new HashSet<Int3>();
+
 		public bool Dirty { get; set; }
 
 		public Chunk(World world, Int3 pos)
@@ -36,27 +38,43 @@ namespace Voxels {
 			this.world = world;
 			this.pos = S*pos;
 			this.voxels = Enumerable.Repeat(Voxel.Empty, S*S*S).ToList();
+			solidVoxels.Clear();
 		}
 		
-		int Index(Int3 p)
+		int ToIndex(Int3 p)
 		{
 			return p.x + S*(p.y + S*p.z);
 		}
 
+		Int3 FromIndex(int i)
+		{
+			int z = i / (S*S);
+			int y = (i - S*z) / S;
+			int x = i - S*(y + S*z);
+			return new Int3(x,y,z);
+		}
+
 		public void Set(Int3 l, Voxel b)
 		{
-			voxels[Index(l)] = b;
+			int idx = ToIndex(l);
+			voxels[idx] = b;
+			if(b.solid) {
+				solidVoxels.Add(l);
+			}
+			else {
+				solidVoxels.Remove(l);
+			}
 			Dirty = true;
 		}
 
 		public Voxel Get(Int3 l)
 		{
-			return voxels[Index(l)];
+			return voxels[ToIndex(l)];
 		}
 
 		public bool IsSolid(Int3 l)
 		{
-			return voxels[Index(l)].solid;
+			return voxels[ToIndex(l)].solid;
 		}
 
 		public Mesh CreateMesh(Vector3 scale)
@@ -91,6 +109,11 @@ namespace Voxels {
 			return CreateMesh(Vector3.one);
 		}
 
+		public IEnumerable<Int3> GetSolidVoxels()
+		{
+			return solidVoxels.AsEnumerable();
+		}
+
 	};
 
 	public class World
@@ -98,6 +121,9 @@ namespace Voxels {
 		Dictionary<Int3,Chunk> chunks = new Dictionary<Int3,Chunk>();
 
 		Vector3 scale = Vector3.one;
+
+		Int3 min = Int3.Zero;
+		Int3 max = Int3.Zero;
 
 		public World(Vector3 scale)
 		{
@@ -122,7 +148,22 @@ namespace Voxels {
 			Split(w.z, out c.z, out l.z);
 		}
 
-		public bool Dirty {
+		public int Combine(int c, int l)
+		{
+			return Chunk.S*c + l;
+		}
+
+		public Int3 Combine(Int3 c, Int3 l)
+		{
+			return new Int3(
+				Combine(c.x, l.x),
+				Combine(c.y, l.y),
+				Combine(c.z, l.z)
+			);
+		}
+
+		public bool Dirty
+		{
 			get {
 				return chunks.Values.Any(c => c.Dirty);
 			}
@@ -135,6 +176,8 @@ namespace Voxels {
 
 		public void Set(Int3 p, Voxel b)
 		{
+			min = min.Min(p);
+			max = max.Max(p);
 			Int3 c = new Int3();
 			Int3 l = new Int3();
 			Split(p, out c, out l);
@@ -190,6 +233,48 @@ namespace Voxels {
 		{
 			Dirty = true;
 			return RecreateDirty();
+		}
+
+		public IEnumerable<Int3> GetSolidVoxels()
+		{
+			return chunks.SelectMany(x => x.Value.GetSolidVoxels().Select(l => Combine(x.Key, l)));
+		}
+
+		public IEnumerable<Int3> GetTopVoxels()
+		{
+			Dictionary<Int2,Int3> topVoxels = new Dictionary<Int2,Int3>();
+			foreach(Int3 p in GetSolidVoxels()) {
+				Int2 key = new Int2(p.x,p.y);
+				Int3 current;
+				if(topVoxels.TryGetValue(key, out current)) {
+					if(current.z < p.z) {
+						current.z = p.z;
+					}
+				}
+				else {
+					current = p;
+				}
+				topVoxels[key] = current;
+			}
+			return topVoxels.Values.AsEnumerable();
+		}
+
+		public bool TryGetTopVoxel(Int3 p, out Int3 top)
+		{
+			return TryGetTopVoxel(p.xy, out top);
+		}
+
+		public bool TryGetTopVoxel(Int2 p2, out Int3 top)
+		{
+			Int3 p = new Int3(p2.x,p2.y,0);
+			for(p.z=max.z; p.z>=min.z; p.z--) {
+				if(IsSolid(p)) {
+					top = p;
+					return true;
+				}
+			}
+			top = new Int3(p2.x, p2.y, int.MinValue);
+			return false;
 		}
 
 	}

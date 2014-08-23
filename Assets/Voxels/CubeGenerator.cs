@@ -58,7 +58,7 @@ static public class CubeGenerator
 	{
 		int n = md.vertices.Count;
 		for(int i=0; i<CUBE_INDICES.Length; i++) {
-			md.vertices.Add(CUBE_VERTICES[CUBE_INDICES[i]-1] + new Int3(pos.x,pos.z,pos.y));
+			md.vertices.Add(CUBE_VERTICES[CUBE_INDICES[i]-1] + pos.ToVector3());
 			md.normals.Add(CUBE_NORMALS[CUBE_NORMAL_INDICES[i]-1]);
 			md.colors.Add(color);
 			md.indices.Add(i + n);

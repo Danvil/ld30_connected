@@ -42,11 +42,11 @@ namespace SLPerlinNoise
 
       #region Contructors
 
-      public PerlinNoise3D(int seed=0)
+      public PerlinNoise3D(int seed)
       {
          permutation = new int[256];
          p = new int[permutation.Length * 2];
-         InitNoiseFunctions(seed);
+         InitNoiseFunctions(0);
 
          // Default values
          Frequency      = 0.023f;
@@ -54,12 +54,12 @@ namespace SLPerlinNoise
          Persistence    = 0.9f;
          Octaves        = 2;
       }
-
-      #endregion
-
-      #region Methods
-
-      public void InitNoiseFunctions(int seed)
+		
+		#endregion
+		
+		#region Methods
+		
+		public void InitNoiseFunctions(int seed)
       {
 		 Random rand = seed==0 ? new Random() : new Random(seed);
 

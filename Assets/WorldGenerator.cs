@@ -10,9 +10,9 @@ public class WorldGenerator
 		
 	public WorldGenerator()
 	{
-		perlin = new SLPerlinNoise.PerlinNoise3D();
+		perlin = new SLPerlinNoise.PerlinNoise3D(0);
 		vAir = Voxels.Voxel.Empty;
-		vWater = new Voxels.Voxel(true, new Color(0.50f,0.55f,0.95f));
+		vWater = new Voxels.Voxel(true, new Color(0.35f,0.50f,0.75f));
 		vLand = new Voxels.Voxel(true, new Color(0.98f,0.98f,0.98f));
 	}
 

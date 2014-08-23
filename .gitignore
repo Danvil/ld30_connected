@@ -1,0 +1,13 @@
+*.pidb
+*.userprefs
+Library
+build
+Temp
+Builds
+*.csproj
+*.sln
+*.sublime-workspace
+*.blend1
+*.blend1.meta
+*.blend2
+*.blend2.meta

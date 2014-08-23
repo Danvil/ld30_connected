@@ -13,8 +13,8 @@ public class World : MonoBehaviour {
 	{
 		foreach(var chunk in gen.Create()) {
 			GameObject go = (GameObject)Instantiate(pfVoxelChunk);
-			go.transform.parent = this.transform;
 			go.SetMesh(chunk);
+			go.transform.parent = this.transform;
 		}
 	}
 

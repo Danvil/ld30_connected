@@ -4,12 +4,32 @@ using System.Collections.Generic;
 
 public class WorldGenerator
 {
+	SLPerlinNoise.PerlinNoise3D perlin;
+
+	Voxels.Voxel vAir, vWater, vLand;
+		
+	public WorldGenerator()
+	{
+		perlin = new SLPerlinNoise.PerlinNoise3D();
+		vAir = Voxels.Voxel.Empty;
+		vWater = new Voxels.Voxel(true, new Color(0.50f,0.55f,0.95f));
+		vLand = new Voxels.Voxel(true, new Color(0.98f,0.98f,0.98f));
+	}
+
 	Voxels.Voxel Evaluate(int x, int y, int z)
 	{
-		Voxels.Voxel b = new Voxels.Voxel();
-		b.solid = true;
-		b.color = Color.white;
-		return b;
+		float q = Mathf.Max(0, 5*(1+perlin.Compute(x,y,0)));
+		if(z > q) {
+			if(z < 4) {
+				return vWater;
+			}
+			else {
+				return vAir;
+			}
+		}
+		else {
+			return vLand;
+		}
 	}
 
 	public IEnumerable<Mesh> Create()

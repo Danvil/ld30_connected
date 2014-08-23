@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Voxels {
 
-public struct Voxel
+public class Voxel
 {
 	public bool solid;
 	public Color color;

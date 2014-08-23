@@ -5,6 +5,7 @@ using System.Collections;
 public class InputMove : MonoBehaviour {
 	
 	public float speed = 1.0f;
+	public bool relativeMove = false;
 
 	// Use this for initialization
 	void Start () {
@@ -16,7 +17,10 @@ public class InputMove : MonoBehaviour {
 		float dz = Input.GetAxis("Vertical");
 		float dx = Input.GetAxis("Horizontal");
 		Vector3 delta = Time.deltaTime*speed*(new Vector3(dx,0,dz)).Limit(1.0f);
-		this.transform.position += this.transform.rotation * delta;
+		if(relativeMove) {
+			delta = this.transform.rotation * delta;
+		}
+		this.transform.position += delta;
 
 	}
 }

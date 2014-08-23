@@ -17,4 +17,9 @@ public static class MathTools
 			return v;
 		}
 	}
+
+	public static Vector3 CoeffMult(this Vector3 a, Vector3 b)
+	{
+		return new Vector3(a.x*b.x, a.y*b.y, a.z*b.z);
+	}
 }

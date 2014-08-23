@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class WorldGenerator
 {
@@ -16,11 +17,29 @@ public class WorldGenerator
 		vLand = new Voxels.Voxel(true, new Color(0.98f,0.98f,0.98f));
 	}
 
-	Voxels.Voxel Evaluate(int x, int y, int z)
+	public Voxels.World Create(int sx, int sy, int sz, Vector3 scale, Func<int,int,int,Voxels.Voxel> f)
 	{
-		float q = Mathf.Max(0, 5*(1+perlin.Compute(x,y,0)));
+		perlin.InitNoiseFunctions(0);
+		Voxels.World w = new Voxels.World(scale);
+		Int3 p = Int3.Zero;
+		for(p.z=0; p.z<sz; p.z++) {
+			for(p.y=0; p.y<sy; p.y++) {
+				for(p.x=0; p.x<sx; p.x++) {
+					w.Set(p, f(p.x,p.y,p.z));
+				}
+			}
+		}
+		return w;
+	}
+
+	const int WATER_HEIGHT = 0; // 4
+	const float XY_SCALE = 2.0f;
+
+	Voxels.Voxel FMiniMinecraft(int x, int y, int z)
+	{
+		float q = Mathf.Max(0, 5*(1+perlin.Compute(XY_SCALE*x,XY_SCALE*y,0)));
 		if(z > q) {
-			if(z < 4) {
+			if(z < WATER_HEIGHT) {
 				return vWater;
 			}
 			else {
@@ -32,24 +51,30 @@ public class WorldGenerator
 		}
 	}
 
-	public IEnumerable<Mesh> Create()
+	public Voxels.World CreateMiniMinecraft()
 	{
-		Voxels.World w = new Voxels.World();
-		const int SIZE_X = 32;
-		const int SIZE_Y = 32;
-		const int SIZE_Z = 8;
-		for(int z=0; z<SIZE_Z; z++) {
-			for(int y=0; y<SIZE_Y; y++) {
-				for(int x=0; x<SIZE_X; x++) {
-					w.Set(new Int3(x,y,z), Evaluate(x,y,z));
-				}
-			}
+		return Create(32,32,8,Vector3.one,FMiniMinecraft);
+	}
+
+	const int DISK_RAD = 12;
+
+	Voxels.Voxel FDiscworld(int x, int y, int z)
+	{
+		int dx = x - DISK_RAD;
+		int dy = y - DISK_RAD;
+		float r = Mathf.Sqrt(dx*dx + dy*dy);
+		if(r > DISK_RAD) {
+			return vAir;
 		}
-		// md.AddCube(new Int3(0,0,0));
-		// md.AddCube(new Int3(1,0,0));
-		// md.AddCube(new Int3(2,0,0));
-		// md.AddCube(new Int3(2,0,1), new Color(1.00f,0.50f,0.00f));
-		return w.CreateMesh();
+		return FMiniMinecraft(x,y,z);
+	}
+
+	public Voxels.World CreateDiscworld()
+	{
+		Vector3 scale = Vector3.one;// new Vector3(4,4,4);
+		// pass 1: solid
+		Voxels.World vw = Create(2*DISK_RAD,2*DISK_RAD,4,scale,FDiscworld);
+		return vw;
 	}
 
 }

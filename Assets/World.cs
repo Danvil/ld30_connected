@@ -3,24 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
+[RequireComponent(typeof(VoxelRenderer))]
 public class World : MonoBehaviour {
-
-	public GameObject pfVoxelChunk;
 
 	static WorldGenerator gen = new WorldGenerator();
 
-	void Create()
-	{
-		foreach(var chunk in gen.Create()) {
-			GameObject go = (GameObject)Instantiate(pfVoxelChunk);
-			go.SetMesh(chunk);
-			go.transform.parent = this.transform;
-		}
-	}
+	Voxels.World voxelWorld;
 
 	// Use this for initialization
 	void Start () {
-		Create();
+		voxelWorld = gen.CreateDiscworld();
+		GetComponent<VoxelRenderer>().SetWorld(voxelWorld);
 	}
 	
 	// Update is called once per frame

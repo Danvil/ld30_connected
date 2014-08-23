@@ -17,15 +17,23 @@ public class MeshData
 		indices.Clear();
 	}
 
-	public Mesh CreateMesh()
+	public Mesh CreateMesh(Vector3 scale)
 	{
 		Mesh mesh = new Mesh();
+		for(int i=0; i<vertices.Count; i++) {
+			vertices[i] = vertices[i].CoeffMult(scale);
+		}
 		mesh.vertices = vertices.ToArray();
 		mesh.triangles = indices.ToArray();
 		mesh.normals = normals.ToArray();
 		mesh.colors = colors.ToArray();
 		//mesh.RecalculateNormals();
 		return mesh;
+	}
+
+	public Mesh CreateMesh()
+	{
+		return CreateMesh(Vector3.one);
 	}
 
 }

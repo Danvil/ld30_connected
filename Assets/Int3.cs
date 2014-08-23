@@ -11,6 +11,7 @@ public struct Int3
 		this.z = z;
 	}
 
+	public static Int3 Zero = new Int3(0,0,0);
 	public static Int3 X = new Int3(1,0,0);
 	public static Int3 Y = new Int3(0,1,0);
 	public static Int3 Z = new Int3(0,0,1);

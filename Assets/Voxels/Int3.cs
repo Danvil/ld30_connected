@@ -2,8 +2,19 @@ using UnityEngine;
 
 public static class Int3Helper
 {
+	static int ToInt(float v) {
+		if(v >= 0) {
+			return (int)v;
+		}
+		else {
+			return (int)v - 1;
+		}
+	}
+
 	public static Int3 ToInt3(this Vector3 v)
-	{ return new Int3(v); }
+	{
+		return new Int3(ToInt(v.x), ToInt(v.z), ToInt(v.y));
+	}
 }
 
 [System.Serializable]
@@ -16,13 +27,6 @@ public struct Int3
 		this.x = x;
 		this.y = y;
 		this.z = z;
-	}
-
-	public Int3(Vector3 v)
-	{
-		this.x = (int)v.x;
-		this.y = (int)v.z;
-		this.z = (int)v.y;
 	}
 
 	public Int2 xy

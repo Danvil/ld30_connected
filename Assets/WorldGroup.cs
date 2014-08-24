@@ -3,15 +3,18 @@ using System.Collections;
 
 public class WorldGroup : MonoBehaviour {
 
-	World world;
+	public World World { get; private set; }
 
-	WorldInterface gui;
+	public Portal Portal { get; private set; }
+
+	public WorldInterface gui { get; private set; }
 
 	// Use this for initialization
 	void Start () {
-		world = GetComponentInChildren<World>();
+		World = GetComponentInChildren<World>();
+		Portal = GetComponentInChildren<Portal>();
 		gui = GetComponentInChildren<WorldInterface>();
-		gui.world = world;
+		gui.world = World;
 	}
 	
 	// Update is called once per frame

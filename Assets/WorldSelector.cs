@@ -10,18 +10,6 @@ public class WorldSelector : MonoBehaviour {
 	public float heightLow = 30.0f;
 	public float heightHigh = 70.0f;
 
-	List<World> worlds = new List<World>();
-
-	public void AddWorld(World w)
-	{
-		worlds.Add(w);
-	}
-
-	Vector3 WorldsMeanPoint()
-	{
-		return worlds.Select(w => w.transform.position).Aggregate((a,b)=>a+b) / (float)worlds.Count;
-	}
-
 	void Awake()
 	{
 		Singleton = this;
@@ -50,7 +38,7 @@ public class WorldSelector : MonoBehaviour {
 		}
 		// home
 		if(Input.GetKeyDown(KeyCode.H)) {
-			Vector3 mp = WorldsMeanPoint();
+			Vector3 mp = Galaxy.Singleton.WorldsMeanPoint();
 			float z = heightHigh / Mathf.Tan(Mathf.Deg2Rad * camera.transform.rotation.eulerAngles.x);
 			camera.transform.position = mp + new Vector3(0,heightHigh,-z);
 			height = heightHigh;

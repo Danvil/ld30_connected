@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Interface : MonoBehaviour {
+public class GlobalInterface : MonoBehaviour {
 
 	public UnityEngine.UI.Text txtWorlds;
 	public UnityEngine.UI.Text txtRobots;

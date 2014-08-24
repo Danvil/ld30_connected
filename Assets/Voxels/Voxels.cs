@@ -235,7 +235,7 @@ namespace Voxels {
 					p.Value.Dirty = false;
 				}
 			}
-			Debug.Log(string.Format("Recreated {0}/{1} chunks", result.Count, chunks.Count));
+			Debug.Log(string.Format("Voxels: Recreated {0}/{1} chunks", result.Count, chunks.Count));
 			return result;
 		}
 

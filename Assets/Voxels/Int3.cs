@@ -6,6 +6,7 @@ public static class Int3Helper
 	{ return new Int3(v); }
 }
 
+[System.Serializable]
 public struct Int3
 {
 	public int x, y, z;
@@ -73,5 +74,17 @@ public struct Int3
 	
 	public static Vector3 operator-(Int3 a, Vector3 b) 
 	{ return new Vector3(a.x - b.x, a.y - b.y, a.z - b.z); }
+
+	public override bool Equals(object obj)
+	{ return obj != null && obj is Int3 && this == (Int3)obj; }
+
+	public override int GetHashCode()
+	{ return x ^ y ^ z; }
+
+	public static bool operator==(Int3 a, Int3 b)
+	{ return a.x == b.x && a.y == b.y && a.z == b.z; }
+	
+	public static bool operator!=(Int3 a, Int3 b)
+	{ return a.x != b.x && a.y != b.y && a.z != b.z; }
 	
 };

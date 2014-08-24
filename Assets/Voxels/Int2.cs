@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[System.Serializable]
 public struct Int2
 {
 	public int x, y;

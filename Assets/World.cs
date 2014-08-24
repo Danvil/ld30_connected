@@ -9,8 +9,8 @@ public class World : MonoBehaviour {
 	static WorldVoxelGenerator gen = new WorldVoxelGenerator();
 
 	public GameObject pfMineral;
+	public GameObject pfMineralVoxel;
 	public GameObject pfPlant;
-	public GameObject pfGoo;
 	public GameObject pfRobot;
 
 	public int numMinerals = 100;
@@ -29,15 +29,31 @@ public class World : MonoBehaviour {
 		}
 	}
 
-	List<GameObject> objects = new List<GameObject>();
+	List<WorldItem> objects = new List<WorldItem>();
 
-	public IEnumerable<GameObject> FindObjectsInSphere(Vector3 pos, float r)
+	public IEnumerable<WorldItem> FindObjectsInSphere(Vector3 pos, float r)
 	{
 		foreach(var x in objects) {
-			if((x.transform.position - pos).magnitude < r) {
-				yield return x;
+			if((x.transform.position - pos).magnitude >= r) {
+				continue;
 			}
+			if(!Voxels.IsTopVoxelOrHigher(x.transform.position.ToInt3())) {
+				continue;
+			}
+			yield return x;
 		}
+	}
+
+	public void Add(WorldItem wi)
+	{
+		wi.world = this;
+		objects.Add(wi);
+	}
+
+	public void Remove(WorldItem wi)
+	{
+		objects.Remove(wi);
+		wi.world = null;
 	}
 
 	void Generate()
@@ -49,8 +65,15 @@ public class World : MonoBehaviour {
 		foreach(Int3 p in Voxels.GetSolidVoxels().RandomSample(numMinerals)) {
 			GameObject go = (GameObject)Instantiate(pfMineral);
 			go.transform.parent = this.transform;
-			go.transform.localPosition = p.ToVector3() + new Vector3(0.5f,0,0.5f);
-			objects.Add(go);
+			go.transform.localPosition = p.ToVector3() + new Vector3(0.5f,0.5f,0.5f);
+			Add(go.GetComponent<WorldItem>());
+		}
+		// plant small minerals in every voxel
+		foreach(Int3 p in Voxels.GetTopVoxels()) {
+			GameObject go = (GameObject)Instantiate(pfMineralVoxel);
+			go.transform.parent = this.transform;
+			go.transform.localPosition = p.ToVector3() + new Vector3(0.5f,0.5f,0.5f);
+			Add(go.GetComponent<WorldItem>());
 		}
 		// third pass plants
 		// plant 40 plants on top of random solid top voxels
@@ -58,16 +81,30 @@ public class World : MonoBehaviour {
 			GameObject go = (GameObject)Instantiate(pfPlant);
 			go.transform.parent = this.transform;
 			go.transform.localPosition = p.ToVector3() + new Vector3(0.5f,1,0.5f);
-			objects.Add(go);
+			Add(go.GetComponent<WorldItem>());
 		}
 		// robot
 		foreach(Int3 p in Voxels.GetTopVoxels().RandomSample(numRobots)) {
 			GameObject go = (GameObject)Instantiate(pfRobot);
+			go.transform.parent = this.transform;
 			Robot rob =	go.GetComponent<Robot>();
 			rob.world = this;
 			rob.SetNewPosition(this.transform.position + p.ToVector3() + new Vector3(0.5f,1,0.5f));
-			objects.Add(go);
+			Add(go.GetComponent<WorldItem>());
 		}
+	}
+
+	public void DestroyVoxel(Int3 v)
+	{
+		if(Voxels.Get(v).solid == global::Voxels.Voxel.Solidness.Ultra) {
+			return;
+		}
+		Voxels.Set(v, global::Voxels.Voxel.Empty);
+		// place mineral for voxel below
+		GameObject go = (GameObject)Instantiate(pfMineralVoxel);
+		go.transform.parent = this.transform;
+		go.transform.localPosition = (v - Int3.Z).ToVector3() + new Vector3(0.5f,0.5f,0.5f);
+		Add(go.GetComponent<WorldItem>());
 	}
 
 	// Use this for initialization
@@ -77,19 +114,14 @@ public class World : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		List<GameObject> objectsNew = new List<GameObject>();
-		foreach(var x in objects) {
-			var dest = x.GetComponent<Destroyable>();
-			if(dest && dest.Dead) {
-				GameObject go = (GameObject)Instantiate(pfGoo);
-				go.transform.parent = this.transform;
-				go.transform.position = x.transform.position;
-				objectsNew.Add(go);
-				Destroy(x);
-				continue;
-			}
-			objectsNew.Add(x);
-		}
-		objects = objectsNew;
+		// List<GameObject> objectsNew = new List<GameObject>();
+		// foreach(var x in objects) {
+		// 	var dest = x.GetComponent<Destroyable>();
+		// 	if(dest && dest.Dead) {
+		// 		continue;
+		// 	}
+		// 	objectsNew.Add(x);
+		// }
+		// objects = objectsNew;
 	}
 }

@@ -7,14 +7,15 @@ public class WorldVoxelGenerator
 {
 	SLPerlinNoise.PerlinNoise3D perlin;
 
-	Voxels.Voxel vAir, vWater, vLand;
+	Voxels.Voxel vAir, vWater, vLand, vBedRock;
 		
 	public WorldVoxelGenerator()
 	{
 		perlin = new SLPerlinNoise.PerlinNoise3D(0);
 		vAir = Voxels.Voxel.Empty;
-		vWater = new Voxels.Voxel(true, new Color(0.35f,0.50f,0.75f));
-		vLand = new Voxels.Voxel(true, new Color(0.98f,0.98f,0.98f));
+		vWater = new Voxels.Voxel(Voxels.Voxel.Solidness.Soft, new Color(0.35f,0.50f,0.75f));
+		vLand = new Voxels.Voxel(Voxels.Voxel.Solidness.Normal, new Color(0.98f,0.98f,0.98f));
+		vBedRock = new Voxels.Voxel(Voxels.Voxel.Solidness.Ultra, new Color(0.21f,0.22f,0.22f));
 	}
 
 	public Voxels.World Create(int sx, int sy, int sz, Vector3 scale, Func<int,int,int,Voxels.Voxel> f)
@@ -74,6 +75,10 @@ public class WorldVoxelGenerator
 		Vector3 scale = Vector3.one;// new Vector3(4,4,4);
 		// pass 1: solid
 		Voxels.World vw = Create(2*DISK_RAD,2*DISK_RAD,4,scale,FDiscworld);
+		// pass 2: bottom is bedrock
+		foreach(Int3 i in vw.GetBottomVoxels()) {
+			vw.Set(i, vBedRock);
+		}
 		return vw;
 	}
 

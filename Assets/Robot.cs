@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(LaserArm))]
+[RequireComponent(typeof(LaserArm), typeof(Falling))]
 public class Robot : MonoBehaviour {
 
 	public World world;
@@ -18,6 +18,7 @@ public class Robot : MonoBehaviour {
 	void Start ()
 	{
 		laser = GetComponentInChildren<LaserArm>();
+		falling = GetComponent<Falling>();
 	}
 
 	// Update is called once per frame
@@ -45,6 +46,7 @@ public class Robot : MonoBehaviour {
 
 	Destroyable laserTarget;
 	LaserArm laser;
+	float desintegrateCooldown = 0.0f;
 
 	bool IsValidLaserTarget(Destroyable u)
 	{
@@ -68,15 +70,46 @@ public class Robot : MonoBehaviour {
 		return IsValidLaserTarget(laserTarget);
 	}
 
+	const float MINING_THRESHOLD = 0.8f;
+	const float MINING_LOW_RATE = 0.1f;
+	const float MINING_SLEEP = 1.0f;
+
+	float lowMineProb = 0.0f;
+
 	bool ActionDesintegrateSelect()
 	{
+		desintegrateCooldown -= Time.deltaTime;
+		// find hightest value
 		foreach(var go in world.FindObjectsInSphere(this.transform.position, maxLaserDist)) {
-			laserTarget = go.GetComponent<Destroyable>();
-			if(laserTarget && IsValidLaserTarget(laserTarget)) {
-				return true;
+			var t = go.GetComponent<Destroyable>();
+			if(t && IsValidLaserTarget(t)) {
+				if(laserTarget == null || t.dropAmount > laserTarget.dropAmount) {
+					laserTarget = t;
+				}
 			}
 		}
-		return false;
+		if(!laserTarget) {
+			return false;
+		}
+		// shall we really?
+		// check value
+		if(laserTarget.dropAmount > MINING_THRESHOLD) {
+			lowMineProb = 0.0f;
+			return true;
+		}
+		else {
+			lowMineProb += Time.deltaTime * MINING_LOW_RATE;
+			if(desintegrateCooldown > 0) {
+				laserTarget = null;
+				return false;
+			}
+			if(Random.value > Mathf.Min(0.95f,lowMineProb)) {
+				desintegrateCooldown = MINING_SLEEP;
+				laserTarget = null;
+				return false;
+			}
+			return true;
+		}
 	}
 
 	bool ActionDesintegrate()
@@ -99,23 +132,21 @@ public class Robot : MonoBehaviour {
 	public bool ActionFindNewGoal()
 	{
 		// move randomly
-		Vector3 dir = new Vector3(MathTools.Random(-3.00f,+3.00f), 0, MathTools.Random(-3.00f,+3.00f));
-		goal = this.transform.position + dir;
+		Vector3 dir = new Vector3(MathTools.Random(-1.00f,+1.00f), 0, MathTools.Random(-1.00f,+1.00f));
+		goal = this.transform.position + MathTools.Random(2.00f,4.00f)*dir.normalized;
 		return true;
 	}
 
 	public void SetNewPosition(Vector3 p)
 	{
-		world.Voxels.TryGetTopVoxel(p.ToInt3(), out topVoxel);
 		this.transform.position = p;
 		ActionFindNewGoal();
 	}
 
+	Falling falling;
+
 	Vector3 goal;
-	Vector3 velocity = Vector3.zero;
 	float heading;
-	bool isFalling = false;
-	Int3 topVoxel;
 
 	void SetRotation(float spin)
 	{
@@ -127,23 +158,15 @@ public class Robot : MonoBehaviour {
 	{
 		// position
 		Vector3 pos = this.transform.position;
-		// test if falling
-		isFalling = (pos.y > topVoxel.z + 1.5f);
 		// fall
-		if(isFalling) {
-			// fall down
-			pos += Time.deltaTime * velocity;
-			velocity += Time.deltaTime * world.gravity;
-			this.transform.position = pos;
-			heading += Time.deltaTime*fallingSpinAngularVelocity;
-			SetRotation(heading);
-			// check if we fall to death
-			// FIXME
+		if(falling.IsFalling) {
+			// fall down and spiral
+			//heading += Time.deltaTime*fallingSpinAngularVelocity;
+			//SetRotation(heading);
 			// we are falling
 			return true;
 		}
 		else {
-			velocity = Vector3.zero;
 			// move to goal
 			Vector3 dir = goal - pos;
 			dir.y = 0.0f;
@@ -156,10 +179,8 @@ public class Robot : MonoBehaviour {
 				// move to goal
 				heading = Mathf.Atan2(dir.x,dir.z) * Mathf.Rad2Deg;
 				Vector3 newpos = pos + Time.deltaTime * speed * dir.normalized;
-				Int3 newTopVoxel;
-				if(world.Voxels.TryGetTopVoxel(newpos.ToInt3(), out newTopVoxel)) {
-					newpos.y = topVoxel.z + 1.5f;
-					topVoxel = newTopVoxel;
+				if(falling.CheckIfSafe(newpos)) {
+					//newpos.y = topVoxel.z + 1.5f;
 					goal.y = newpos.y;
 					this.transform.position = newpos;
 					SetRotation(heading);

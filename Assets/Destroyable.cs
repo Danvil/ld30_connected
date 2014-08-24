@@ -54,6 +54,13 @@ public class Destroyable : MonoBehaviour {
 	}
 
 	IEnumerator Fade() {
+		Robot r = GetComponent<Robot>();
+		if(r) {
+			r.MoveToSpace();
+		}
+		// stop all scripts
+		this.enabled = false;
+		// fade out
 		while(this.transform.localScale.magnitude > 0.1f) {
 			this.transform.localScale *= (1.0f - decayRate*Time.deltaTime);
 			yield return null;

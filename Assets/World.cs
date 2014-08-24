@@ -164,7 +164,7 @@ public class World : MonoBehaviour {
 			Robot rob =	go.GetComponent<Robot>();
 			rob.Team = WorldGroup.Team;
 			rob.SetNewPosition(this.transform.position + p.ToVector3() + new Vector3(0.5f,1,0.5f));
-			Add(go.GetComponent<WorldItem>());
+			rob.MoveToWorld(this);
 		}
 		// robot hauler
 		foreach(Int3 p in Voxels.GetTopVoxels().RandomSample(numRobotsHauler)) {
@@ -173,7 +173,7 @@ public class World : MonoBehaviour {
 			Robot rob =	go.GetComponent<Robot>();
 			rob.Team = WorldGroup.Team;
 			rob.SetNewPosition(this.transform.position + p.ToVector3() + new Vector3(0.5f,1,0.5f));
-			Add(go.GetComponent<WorldItem>());
+			rob.MoveToWorld(this);
 		}
 	}
 

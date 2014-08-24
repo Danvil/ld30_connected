@@ -53,7 +53,6 @@ public class Robot : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
 	{
-		world = GetComponent<WorldItem>().world;
 		GlobalInterface.Singleton.NumRobots += 1;
 	}
 
@@ -66,7 +65,9 @@ public class Robot : MonoBehaviour {
 	{
 		world.Remove(this.GetComponent<WorldItem>());
 		world = null;
-		GetComponent<Falling>().enabled = false;
+		var fall = GetComponent<Falling>();
+		fall.enabled = true;
+		fall.world = null;
 	}
 
 	public void MoveToWorld(World w)
@@ -74,7 +75,10 @@ public class Robot : MonoBehaviour {
 		world = w;
 		this.transform.parent = w.transform;
 		world.Add(this.GetComponent<WorldItem>());
-		GetComponent<Falling>().enabled = true;
+		var fall = GetComponent<Falling>();
+		fall.enabled = true;
+		fall.world = w;
+		SetNewPosition(this.transform.position);
 	}
 
 	// Update is called once per frame
@@ -281,7 +285,7 @@ public class Robot : MonoBehaviour {
 
 	bool DesintegrateActionHasValidDestroyable()
 	{
-		return laserTarget && !laserTarget.Dead && world.AllowMining;
+		return ValidDesintegrateDestroyable(laserTarget);
 	}
 	
 	bool DesintegrateActionIsDestroyableInRange()
@@ -309,16 +313,29 @@ public class Robot : MonoBehaviour {
 		if(x == null || x.Dead) {
 			return false;
 		}
-		// only attack no-team robots
-		Robot r = x.GetComponent<Robot>();
-		if(r && r.Team == this.Team) {
-			return false;
+		if(world.WorldGroup.Team != this.team) {
+			// conquer the planet!
+			Robot r = x.GetComponent<Robot>();
+			if(r) {
+				return (r.Team != this.Team);
+			}
+			else {
+				return false;
+			}
 		}
-		// assume rest is mining
-		if(this.Team == Team.NEUTRAL) {
-			return false;
+		else {
+			// only attack no-team robots
+			Robot r = x.GetComponent<Robot>();
+			if(r) {
+				return (r.Team != this.Team);
+			}
+			// assume rest is mining
+			// neutral team does not mine
+			if(this.Team == Team.NEUTRAL) {
+				return false;
+			}
+			return world.AllowMining;
 		}
-		return world.AllowMining;
 	}
 
 	bool DesintegrateActionSelectDestroyable()

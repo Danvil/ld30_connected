@@ -52,11 +52,13 @@ public class Factory : MonoBehaviour {
 			}
 			yield return null;
 		}
+		construct.transform.localScale = Vector3.one;
 		// let loose
 		construct.transform.localPosition = exitPoint;
 		construct.transform.parent = world.transform;
-		construct.GetComponent<Robot>().Team = world.WorldGroup.Team;
-		world.Add(construct.GetComponent<WorldItem>());
+		Robot robot = construct.GetComponent<Robot>();
+		robot.Team = world.WorldGroup.Team;
+		robot.MoveToWorld(world);
 		foreach(var s in construct.GetComponents<MonoBehaviour>()) {
 			s.enabled = true;
 		}

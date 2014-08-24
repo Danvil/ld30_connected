@@ -33,7 +33,7 @@ public class LaserArm : MonoBehaviour {
 				Vector3.forward, tp - this.transform.position);
 			float r = (tp - this.transform.position).magnitude;
 			laser.SetPosition(1, new Vector3(0,0,r));
-			Target.Health -= Time.deltaTime * damageRate;
+			Target.Health -= Time.deltaTime * damageRate * MathTools.Random(0.85f,1.18f);
 		}
 		else {
 			this.transform.localRotation = Quaternion.identity;

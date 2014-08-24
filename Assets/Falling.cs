@@ -15,7 +15,7 @@ public class Falling : MonoBehaviour {
 	Int3 lastVoxelPos;
 	Int3 topVoxel;
 
-	World world;
+	public World world;
 
 	public bool CheckIfSafe(Vector3 pos)
 	{

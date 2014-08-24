@@ -44,12 +44,7 @@ public class Trunk : MonoBehaviour {
 
 	public float MaxCanLoad(Pickable p)
 	{
-		if(load == 0.0f || p.type == Type) {
-			return Mathf.Min(RemainingCapacity, p.Amount);
-		}
-		else {
-			return 0.0f;
-		}
+		return MaxCanLoad(p.type, p.Amount);
 	}
 
 	void SetLoadHeight()

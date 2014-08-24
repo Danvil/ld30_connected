@@ -137,14 +137,25 @@ public class Robot : MonoBehaviour {
 		return true;
 	}
 
+	float GoalTolerance
+	{
+		get
+		{
+			return distToGoal + 1.0f/20.0f * speed;
+		}
+	}
+
 	bool HaulActionIsDropoffInRange()
 	{
 		if(!world.Building) {
 			return false;
 		}
 		haulDropoff = world.Building.GetComponent<ResourceDropoff>();
-		if(!haulDropoff) return false;
-		return (this.transform.position.xz() - haulDropoff.DropOffPointWorld.xz()).magnitude <= distToGoal;
+		if(!haulDropoff) {
+			return false;
+		}
+		float d = (this.transform.position.xz() - haulDropoff.DropOffPointWorld.xz()).magnitude;
+		return d <= GoalTolerance;
 	}
 
 	bool HaulActionUnload()
@@ -173,7 +184,7 @@ public class Robot : MonoBehaviour {
 		haulTarget = world
 			.FindTopObjects<Pickable>(this.transform.position, searchRadius)
 			.Where(x => x != null && !x.Depleted)
-			.FindBest(this.transform.position, t => trunk.MaxCanLoad(t.type, t.Amount));			
+			.FindBest(this.transform.position, t => trunk.MaxCanLoad(t));			
 		// haulTarget = null;
 		// float score = 0.0f;
 		// foreach(Pickable t in world.FindTopObjects<Pickable>(this.transform.position, searchRadius)) {
@@ -331,7 +342,7 @@ public class Robot : MonoBehaviour {
 	{
 		Vector3 dir = goal - this.transform.position;
 		dir.y = 0.0f;
-		return (dir.magnitude <= distToGoal + 1.0f/20.0f * speed);
+		return (dir.magnitude <= GoalTolerance);
 	}
 
 	bool MoveActionMoveToGoal()

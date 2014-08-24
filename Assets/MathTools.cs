@@ -13,7 +13,7 @@ public static class MathTools
 			float currentValue = fval(t);
 			float currentDist = 1.0f + (t.transform.position.xz() - pos.xz()).magnitude;
 			float currentScore = currentValue / currentDist;
-			if(best == null || currentScore > score) {
+			if(currentScore > score) {
 				score = currentScore;
 				best = t;
 			}

@@ -8,6 +8,9 @@ public class World : MonoBehaviour {
 
 	static WorldVoxelGenerator gen = new WorldVoxelGenerator();
 
+	public GameObject pfFactory;
+	public GameObject pfDriller;
+
 	public GameObject pfMineral;
 	public GameObject pfMineralVoxel;
 	public GameObject pfPlant;
@@ -34,6 +37,32 @@ public class World : MonoBehaviour {
 	}
 
 	List<WorldItem> objects = new List<WorldItem>();
+
+	GameObject building;
+
+	public GameObject Building { get; private set; }
+
+	public void BuildFactory()
+	{
+		PlaceBuilding(pfFactory);
+	}
+
+	public void BuildDriller()
+	{
+		PlaceBuilding(pfDriller);
+	}
+
+	void PlaceBuilding(GameObject pf)
+	{
+		if(Building) {
+			return;
+		}
+		building = (GameObject)Instantiate(pf);
+		int h = Voxels.GetTopVoxelHeight(Int3.Zero);
+		building.transform.parent = this.transform;
+		building.transform.localPosition = new Vector3(0,h+1,0);
+		Add(building.GetComponent<WorldItem>());
+	}
 
 	public IEnumerable<WorldItem> FindTopObjects(Vector3 pos, float r)
 	{
@@ -109,7 +138,6 @@ public class World : MonoBehaviour {
 			GameObject go = (GameObject)Instantiate(pfRobotLaser);
 			go.transform.parent = this.transform;
 			Robot rob =	go.GetComponent<Robot>();
-			rob.world = this;
 			rob.SetNewPosition(this.transform.position + p.ToVector3() + new Vector3(0.5f,1,0.5f));
 			Add(go.GetComponent<WorldItem>());
 		}
@@ -118,7 +146,6 @@ public class World : MonoBehaviour {
 			GameObject go = (GameObject)Instantiate(pfRobotHauler);
 			go.transform.parent = this.transform;
 			Robot rob =	go.GetComponent<Robot>();
-			rob.world = this;
 			rob.SetNewPosition(this.transform.position + p.ToVector3() + new Vector3(0.5f,1,0.5f));
 			Add(go.GetComponent<WorldItem>());
 		}
@@ -140,6 +167,7 @@ public class World : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		Generate();
+		GlobalInterface.Singleton.NumWorlds += 1;
 	}
 	
 	// Update is called once per frame

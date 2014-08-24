@@ -23,7 +23,7 @@ public class LaserArm : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if(LaserEnabled) {
+		if(LaserEnabled && Target) {
 			Vector3 tp = Target.transform.position + new Vector3(0,0.5f,0);
 			this.transform.rotation = Quaternion.FromToRotation(
 				Vector3.forward, tp - this.transform.position);

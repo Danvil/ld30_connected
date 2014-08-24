@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Robot : MonoBehaviour {
 
-	public World world;
+	World world;
 
 	public float speed = 1.70f;
 	public float distToGoal = 0.07f;
@@ -21,6 +21,14 @@ public class Robot : MonoBehaviour {
 		falling = GetComponent<Falling>();
 		laser = GetComponentInChildren<LaserArm>();
 		trunk = GetComponentInChildren<Trunk>();
+		world = GetComponent<WorldItem>().world;
+
+		GlobalInterface.Singleton.NumRobots += 1;
+	}
+
+	void OnDestroy()
+	{
+		GlobalInterface.Singleton.NumRobots -= 1;
 	}
 
 	// Update is called once per frame

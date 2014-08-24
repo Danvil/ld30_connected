@@ -18,14 +18,14 @@ public class WorldVoxelGenerator
 		vBedRock = new Voxels.Voxel(Voxels.Voxel.Solidness.Ultra, new Color(0.21f,0.22f,0.22f));
 	}
 
-	public Voxels.World Create(int sx, int sy, int sz, Vector3 scale, Func<int,int,int,Voxels.Voxel> f)
+	public Voxels.World Create(Int3 min, Int3 max, Vector3 scale, Func<int,int,int,Voxels.Voxel> f)
 	{
 		perlin.InitNoiseFunctions(0);
 		Voxels.World w = new Voxels.World(scale);
 		Int3 p = Int3.Zero;
-		for(p.z=0; p.z<sz; p.z++) {
-			for(p.y=0; p.y<sy; p.y++) {
-				for(p.x=0; p.x<sx; p.x++) {
+		for(p.z=min.z; p.z<max.z; p.z++) {
+			for(p.y=min.y; p.y<max.y; p.y++) {
+				for(p.x=min.x; p.x<max.x; p.x++) {
 					w.Set(p, f(p.x,p.y,p.z));
 				}
 			}
@@ -54,14 +54,14 @@ public class WorldVoxelGenerator
 
 	public Voxels.World CreateMiniMinecraft()
 	{
-		return Create(32,32,8,Vector3.one,FMiniMinecraft);
+		return Create(
+			new Int3(0,0,0), new Int3(32,32,8),
+			Vector3.one, FMiniMinecraft);
 	}
 
 	Voxels.Voxel FDiscworld(int x, int y, int z, int radius)
 	{
-		int dx = x - radius;
-		int dy = y - radius;
-		float r = Mathf.Sqrt(dx*dx + dy*dy);
+		float r = Mathf.Sqrt(x*x + y*y);
 		if(r > radius) {
 			return vAir;
 		}
@@ -72,7 +72,9 @@ public class WorldVoxelGenerator
 	{
 		Vector3 scale = Vector3.one;// new Vector3(4,4,4);
 		// pass 1: solid
-		Voxels.World vw = Create(2*radius,2*radius,height,scale,
+		Voxels.World vw = Create(
+			new Int3(-radius,-radius,0), new Int3(radius,radius,height),
+			scale,
 			(x,y,z) => FDiscworld(x,y,z,radius));
 		// pass 2: bottom is bedrock
 		foreach(Int3 i in vw.GetBottomVoxels()) {

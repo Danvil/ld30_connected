@@ -142,12 +142,13 @@ namespace Voxels {
 
 		void Split(int w, out int c, out int l)
 		{
-			c = w / Chunk.S;
-			l = w - Chunk.S*c;
-			if(w < 0) {
-				c -= 1;
-				l += Chunk.S;
+			if(w >= 0) {
+				c = w/Chunk.S;
 			}
+			else {
+				c = (w + 1)/Chunk.S - 1;
+			}
+			l = w - Chunk.S*c;
 			//Debug.Log(string.Format("w={0} c={1} l={2}", w, c, l));
 		}
 
@@ -185,7 +186,7 @@ namespace Voxels {
 		}
 
 		public void Set(Int3 p, Voxel b)
-		{
+		{			
 			min = min.Min(p);
 			max = max.Max(p);
 			Int3 c = new Int3();
@@ -324,6 +325,13 @@ namespace Voxels {
 			Int3 top;
 			TryGetTopVoxel(p.xy, out top);
 			return p.z >= top.z;
+		}
+
+		public int GetTopVoxelHeight(Int3 p)
+		{
+			Int3 top;
+			TryGetTopVoxel(p.xy, out top);
+			return top.z;
 		}
 
 	}

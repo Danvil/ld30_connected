@@ -50,6 +50,7 @@ public class Factory : MonoBehaviour {
 		// let loose
 		construct.transform.localPosition = exitPoint;
 		construct.transform.parent = null;
+		this.GetComponent<WorldItem>().world.Add(construct.GetComponent<WorldItem>());
 		foreach(var s in construct.GetComponents<MonoBehaviour>()) {
 			s.enabled = true;
 		}

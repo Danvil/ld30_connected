@@ -16,6 +16,8 @@ public class WorldItem : MonoBehaviour {
 
 	void OnDestroy()
 	{
-		world.Remove(this);
+		if(world) {
+			world.Remove(this);
+		}
     }
 }

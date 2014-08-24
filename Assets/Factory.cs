@@ -42,9 +42,11 @@ public class Factory : MonoBehaviour {
 		// construction
 		float t = constructionRate;
 		while(t > 0) {
-			t -= Time.deltaTime;
-			float p = 1.0f - t / constructionRate;
-			construct.transform.localScale = p * Vector3.one;
+			if(enableConstruction) {
+				t -= Time.deltaTime;
+				float p = 1.0f - t / constructionRate;
+				construct.transform.localScale = p * Vector3.one;
+			}
 			yield return null;
 		}
 		// let loose

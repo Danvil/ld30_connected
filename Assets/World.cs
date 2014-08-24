@@ -38,8 +38,6 @@ public class World : MonoBehaviour {
 
 	List<WorldItem> objects = new List<WorldItem>();
 
-	GameObject building;
-
 	public GameObject Building { get; private set; }
 
 	public void BuildFactory()
@@ -57,11 +55,22 @@ public class World : MonoBehaviour {
 		if(Building) {
 			return;
 		}
-		building = (GameObject)Instantiate(pf);
+		Building = (GameObject)Instantiate(pf);
 		int h = Voxels.GetTopVoxelHeight(Int3.Zero);
-		building.transform.parent = this.transform;
-		building.transform.localPosition = new Vector3(0,h+1,0);
-		Add(building.GetComponent<WorldItem>());
+		Building.transform.parent = this.transform;
+		Building.transform.localPosition = new Vector3(0,h+1,0);
+		Add(Building.GetComponent<WorldItem>());
+	}
+
+	public void ToogleProduction(bool v)
+	{
+		if(!Building) {
+			return;
+		}
+		Factory factory = Building.GetComponent<Factory>();
+		if(factory) {
+			factory.enableConstruction = v;
+		}
 	}
 
 	public IEnumerable<WorldItem> FindTopObjects(Vector3 pos, float r)

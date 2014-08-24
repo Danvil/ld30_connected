@@ -19,6 +19,26 @@ public class Robot : MonoBehaviour {
 
 	enum Status { Failure, Success, Running };
 
+	Team team;
+	public Team Team
+	{
+		get { return team; }
+		set {
+			team = value;
+			Material mat = Globals.Singleton.TeamMaterial(team);
+			Transform t;
+
+			if(renderer) renderer.material = mat;
+			
+			t = this.transform.FindChild("HaulerMesh");
+			if(t) t.gameObject.renderer.material = mat;
+
+			t = this.transform.FindChild("Arm");
+			if(t) t.gameObject.renderer.material = mat;
+			
+		}
+	}
+
 	void Awake()
 	{
 		falling = GetComponent<Falling>();
@@ -262,13 +282,30 @@ public class Robot : MonoBehaviour {
 
 	float lowMineProb = 0.0f;
 
+	bool ValidDesintegrateDestroyable(Destroyable x)
+	{
+		if(x == null || x.Dead) {
+			return false;
+		}
+		// only attack no-team robots
+		Robot r = x.GetComponent<Robot>();
+		if(r && r.Team == this.Team) {
+			return false;
+		}
+		// assume rest is mining
+		if(this.Team == Team.NEUTRAL) {
+			return false;
+		}
+		return world.AllowMining;
+	}
+
 	bool DesintegrateActionSelectDestroyable()
 	{
 		desintegrateCooldown -= Time.deltaTime;
 		// find hightest value
 		laserTarget = world
 			.FindTopObjects<Destroyable>(this.transform.position, searchRadius)
-			.Where(x => x != null && !x.Dead && world.AllowMining)
+			.Where(ValidDesintegrateDestroyable)
 			.FindBest(this.transform.position, x => x.dropAmount);			
 		// float score = 0.0f;
 		// foreach(Destroyable t in world.FindTopObjects<Destroyable>(this.transform.position, searchRadius)) {

@@ -38,6 +38,48 @@ public class World : MonoBehaviour {
 
 	List<WorldItem> objects = new List<WorldItem>();
 
+
+	public IEnumerable<Robot> FindRobots()
+	{
+		return objects
+			.Select(x => x.GetComponent<Robot>())
+			.Where(x => x != null);
+	}
+
+	public IEnumerable<WorldItem> FindTopObjects(Vector3 pos, float r)
+	{
+		foreach(var x in objects) {
+			if((x.transform.position - pos).magnitude >= r) {
+				continue;
+			}
+			if(!Voxels.IsTopVoxelOrHigher(x.transform.position.ToInt3())) {
+				continue;
+			}
+			yield return x;
+		}
+	}
+
+	public IEnumerable<T> FindTopObjects<T>(Vector3 pos, float r) where T : Component
+	{
+		foreach(var x in objects) {
+			T t = x.GetComponent<T>();
+			if(t == null) {
+				continue;
+			}
+			if((x.transform.position - pos).magnitude >= r) {
+				continue;
+			}
+			if(!Voxels.IsTopVoxelOrHigher(x.transform.position.ToInt3())) {
+				continue;
+			}
+			yield return t;
+		}
+	}
+
+
+	public WorldGroup WorldGroup { get; set; }
+
+
 	public GameObject Building { get; private set; }
 
 	public void BuildFactory()
@@ -74,36 +116,6 @@ public class World : MonoBehaviour {
 	public void ToogleMining(bool v)
 	{
 		AllowMining = v;
-	}
-
-	public IEnumerable<WorldItem> FindTopObjects(Vector3 pos, float r)
-	{
-		foreach(var x in objects) {
-			if((x.transform.position - pos).magnitude >= r) {
-				continue;
-			}
-			if(!Voxels.IsTopVoxelOrHigher(x.transform.position.ToInt3())) {
-				continue;
-			}
-			yield return x;
-		}
-	}
-
-	public IEnumerable<T> FindTopObjects<T>(Vector3 pos, float r) where T : Component
-	{
-		foreach(var x in objects) {
-			T t = x.GetComponent<T>();
-			if(t == null) {
-				continue;
-			}
-			if((x.transform.position - pos).magnitude >= r) {
-				continue;
-			}
-			if(!Voxels.IsTopVoxelOrHigher(x.transform.position.ToInt3())) {
-				continue;
-			}
-			yield return t;
-		}
 	}
 
 	public void Add(WorldItem wi)
@@ -150,6 +162,7 @@ public class World : MonoBehaviour {
 			GameObject go = (GameObject)Instantiate(pfRobotLaser);
 			go.transform.parent = this.transform;
 			Robot rob =	go.GetComponent<Robot>();
+			rob.Team = WorldGroup.Team;
 			rob.SetNewPosition(this.transform.position + p.ToVector3() + new Vector3(0.5f,1,0.5f));
 			Add(go.GetComponent<WorldItem>());
 		}
@@ -158,6 +171,7 @@ public class World : MonoBehaviour {
 			GameObject go = (GameObject)Instantiate(pfRobotHauler);
 			go.transform.parent = this.transform;
 			Robot rob =	go.GetComponent<Robot>();
+			rob.Team = WorldGroup.Team;
 			rob.SetNewPosition(this.transform.position + p.ToVector3() + new Vector3(0.5f,1,0.5f));
 			Add(go.GetComponent<WorldItem>());
 		}
@@ -179,19 +193,12 @@ public class World : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		Generate();
-		GlobalInterface.Singleton.NumWorlds += 1;
+		if(WorldGroup.Team == Globals.Singleton.playerTeam) {
+			GlobalInterface.Singleton.NumWorlds += 1;
+		}
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		// List<GameObject> objectsNew = new List<GameObject>();
-		// foreach(var x in objects) {
-		// 	var dest = x.GetComponent<Destroyable>();
-		// 	if(dest && dest.Dead) {
-		// 		continue;
-		// 	}
-		// 	objectsNew.Add(x);
-		// }
-		// objects = objectsNew;
 	}
 }

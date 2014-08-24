@@ -49,8 +49,11 @@ public class Galaxy : MonoBehaviour {
 			GameObject go = (GameObject)Instantiate(pfWorld);
 			go.transform.position = new Vector3(SPACE*i,0,0);
 			WorldGroup wg = go.GetComponentInChildren<WorldGroup>();
+			wg.Team = Team.NEUTRAL;
 			AddWorld(wg);
 		}
+
+		worlds[1].Team = Globals.Singleton.playerTeam;
 
 		AddConnection(worlds[0], worlds[1]);
 		AddConnection(worlds[1], worlds[2]);

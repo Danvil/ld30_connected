@@ -11,11 +11,15 @@ public class World : MonoBehaviour {
 	public GameObject pfMineral;
 	public GameObject pfMineralVoxel;
 	public GameObject pfPlant;
-	public GameObject pfRobot;
+	public GameObject pfRobotLaser;
+	public GameObject pfRobotHauler;
 
+	public int worldRadius = 16;
+	public int worldHeight = 6;
 	public int numMinerals = 100;
 	public int numPlants = 50;
-	public int numRobots = 10;
+	public int numRobotsLaser = 10;
+	public int numRobotsHauler = 5;
 
 	public Vector3 gravity = new Vector3(0,-9.81f,0);
 
@@ -31,7 +35,7 @@ public class World : MonoBehaviour {
 
 	List<WorldItem> objects = new List<WorldItem>();
 
-	public IEnumerable<WorldItem> FindObjectsInSphere(Vector3 pos, float r)
+	public IEnumerable<WorldItem> FindTopObjects(Vector3 pos, float r)
 	{
 		foreach(var x in objects) {
 			if((x.transform.position - pos).magnitude >= r) {
@@ -41,6 +45,23 @@ public class World : MonoBehaviour {
 				continue;
 			}
 			yield return x;
+		}
+	}
+
+	public IEnumerable<T> FindTopObjects<T>(Vector3 pos, float r) where T : Component
+	{
+		foreach(var x in objects) {
+			T t = x.GetComponent<T>();
+			if(t == null) {
+				continue;
+			}
+			if((x.transform.position - pos).magnitude >= r) {
+				continue;
+			}
+			if(!Voxels.IsTopVoxelOrHigher(x.transform.position.ToInt3())) {
+				continue;
+			}
+			yield return t;
 		}
 	}
 
@@ -59,7 +80,7 @@ public class World : MonoBehaviour {
 	void Generate()
 	{
 		// first pass voxels
-		Voxels = gen.CreateDiscworld();
+		Voxels = gen.CreateDiscworld(worldRadius, worldHeight);
 		// second pass minerals
 		// plant 100 minerals in random solid voxels
 		foreach(Int3 p in Voxels.GetSolidVoxels().RandomSample(numMinerals)) {
@@ -83,9 +104,18 @@ public class World : MonoBehaviour {
 			go.transform.localPosition = p.ToVector3() + new Vector3(0.5f,1,0.5f);
 			Add(go.GetComponent<WorldItem>());
 		}
-		// robot
-		foreach(Int3 p in Voxels.GetTopVoxels().RandomSample(numRobots)) {
-			GameObject go = (GameObject)Instantiate(pfRobot);
+		// robot laser
+		foreach(Int3 p in Voxels.GetTopVoxels().RandomSample(numRobotsLaser)) {
+			GameObject go = (GameObject)Instantiate(pfRobotLaser);
+			go.transform.parent = this.transform;
+			Robot rob =	go.GetComponent<Robot>();
+			rob.world = this;
+			rob.SetNewPosition(this.transform.position + p.ToVector3() + new Vector3(0.5f,1,0.5f));
+			Add(go.GetComponent<WorldItem>());
+		}
+		// robot hauler
+		foreach(Int3 p in Voxels.GetTopVoxels().RandomSample(numRobotsHauler)) {
+			GameObject go = (GameObject)Instantiate(pfRobotHauler);
 			go.transform.parent = this.transform;
 			Robot rob =	go.GetComponent<Robot>();
 			rob.world = this;

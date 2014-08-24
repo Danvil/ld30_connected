@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(LaserArm), typeof(Falling))]
 public class Robot : MonoBehaviour {
 
 	public World world;
@@ -10,37 +9,113 @@ public class Robot : MonoBehaviour {
 	public float distToGoal = 0.07f;
 	public float fallingSpinAngularVelocity = 90.0f;
 
-	public float maxLaserDist = 5.0f;
+	public float maxLaserDist = 4.0f;
+
+	public float maxHaulDist = 1.0f;
 
 	enum Status { Failure, Success, Running };
 
 	// Use this for initialization
 	void Start ()
 	{
-		laser = GetComponentInChildren<LaserArm>();
 		falling = GetComponent<Falling>();
+		laser = GetComponentInChildren<LaserArm>();
+		trunk = GetComponentInChildren<Trunk>();
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
 		// check if we find something to laser nearby :D
-		laser.LaserEnabled = false;
-		if(ActionDesintegrateCheckCurrent()
-			|| ActionDesintegrateSelect()
-		) {
-			if(ActionDesintegrate()) {
-				return;
+		if(laser) {
+			if(ActionDesintegrateCheckCurrent() || ActionDesintegrateSelect()) {
+				if(ActionDesintegrate()) {
+					return;
+				}
+			}
+			else {
+				ActionDesintegrateStop();
 			}
 		}
-		else {
-			ActionDesintegrateStop();
+		// haul stuff
+		if(trunk) {
+			if(ActionHaulCheckCurrent() || ActionHaulSelect()) {
+				if(ActionHaulRun()) {
+					return;
+				}
+			}
+			else {
+				ActionHaulStop();
+			}
 		}
+		// move around
 		if(ActionMove()) {
 			return;
 		}
 		ActionFindNewGoal();
 	}
+
+	#region Hauling
+
+	Trunk trunk;
+	Pickable haulTarget;
+
+	bool HaulIsValidTarget(Pickable u)
+	{
+		// has target
+		if(!u) {
+			return false;
+		}
+		// target is not dead
+		if(u.Depleted) {
+			return false;
+		}
+		// near enough
+		if((this.transform.position - u.transform.position).magnitude > maxHaulDist) {
+			return false;
+		}
+		return true;
+	}
+
+	bool ActionHaulCheckCurrent()
+	{
+		return HaulIsValidTarget(haulTarget);
+	}
+
+	bool ActionHaulSelect()
+	{
+		if(trunk.IsFull) {
+			return false;
+		}
+		// find hightest value
+		float maxValue = 0.0f;
+		foreach(Pickable t in world.FindTopObjects<Pickable>(this.transform.position, maxHaulDist)) {
+			if(t && HaulIsValidTarget(t)) {
+				float value = trunk.MaxCanLoad(t.type, t.Amount);
+				if(haulTarget == null || value > maxValue) {
+					maxValue = value;
+					haulTarget = t;
+				}
+			}
+		}
+		return haulTarget;
+	}
+
+	bool ActionHaulRun()
+	{
+		float delta = Mathf.Max(Time.deltaTime * trunk.loadRate, haulTarget.Amount);
+		delta = trunk.Load(haulTarget.type, delta);
+		haulTarget.Gather(delta);
+		return delta > 0.0f;
+	}
+
+	bool ActionHaulStop()
+	{
+		haulTarget = null;
+		return true;
+	}
+
+	#endregion
 
 	#region ActionDesintegrate
 
@@ -80,8 +155,7 @@ public class Robot : MonoBehaviour {
 	{
 		desintegrateCooldown -= Time.deltaTime;
 		// find hightest value
-		foreach(var go in world.FindObjectsInSphere(this.transform.position, maxLaserDist)) {
-			var t = go.GetComponent<Destroyable>();
+		foreach(Destroyable t in world.FindTopObjects<Destroyable>(this.transform.position, maxLaserDist)) {
 			if(t && IsValidLaserTarget(t)) {
 				if(laserTarget == null || t.dropAmount > laserTarget.dropAmount) {
 					laserTarget = t;
@@ -159,7 +233,7 @@ public class Robot : MonoBehaviour {
 		// position
 		Vector3 pos = this.transform.position;
 		// fall
-		if(falling.IsFalling) {
+		if(falling && falling.IsFalling) {
 			// fall down and spiral
 			//heading += Time.deltaTime*fallingSpinAngularVelocity;
 			//SetRotation(heading);
@@ -179,7 +253,7 @@ public class Robot : MonoBehaviour {
 				// move to goal
 				heading = Mathf.Atan2(dir.x,dir.z) * Mathf.Rad2Deg;
 				Vector3 newpos = pos + Time.deltaTime * speed * dir.normalized;
-				if(falling.CheckIfSafe(newpos)) {
+				if(!falling || falling.CheckIfSafe(newpos)) {
 					//newpos.y = topVoxel.z + 1.5f;
 					goal.y = newpos.y;
 					this.transform.position = newpos;

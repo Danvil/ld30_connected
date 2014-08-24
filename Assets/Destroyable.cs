@@ -40,9 +40,8 @@ public class Destroyable : MonoBehaviour {
 			GameObject go = (GameObject)Instantiate(pfDropping);
 			go.transform.parent = wi.world.transform;
 			go.transform.position = this.transform.position;
+			go.GetComponent<Pickable>().maxAmount = dropAmount;
 			wi.world.Add(go.GetComponent<WorldItem>());
-			// scale dropping
-			go.transform.localScale *= Mathf.Sqrt(dropAmount);
 			// destroy voxel
 			if(destroyVoxel) {
 				var ip = this.transform.localPosition.ToInt3();

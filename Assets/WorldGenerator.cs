@@ -57,24 +57,23 @@ public class WorldVoxelGenerator
 		return Create(32,32,8,Vector3.one,FMiniMinecraft);
 	}
 
-	const int DISK_RAD = 12;
-
-	Voxels.Voxel FDiscworld(int x, int y, int z)
+	Voxels.Voxel FDiscworld(int x, int y, int z, int radius)
 	{
-		int dx = x - DISK_RAD;
-		int dy = y - DISK_RAD;
+		int dx = x - radius;
+		int dy = y - radius;
 		float r = Mathf.Sqrt(dx*dx + dy*dy);
-		if(r > DISK_RAD) {
+		if(r > radius) {
 			return vAir;
 		}
 		return FMiniMinecraft(x,y,z);
 	}
 
-	public Voxels.World CreateDiscworld()
+	public Voxels.World CreateDiscworld(int radius, int height)
 	{
 		Vector3 scale = Vector3.one;// new Vector3(4,4,4);
 		// pass 1: solid
-		Voxels.World vw = Create(2*DISK_RAD,2*DISK_RAD,4,scale,FDiscworld);
+		Voxels.World vw = Create(2*radius,2*radius,height,scale,
+			(x,y,z) => FDiscworld(x,y,z,radius));
 		// pass 2: bottom is bedrock
 		foreach(Int3 i in vw.GetBottomVoxels()) {
 			vw.Set(i, vBedRock);

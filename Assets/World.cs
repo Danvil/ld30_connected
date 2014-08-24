@@ -62,15 +62,11 @@ public class World : MonoBehaviour {
 		Add(Building.GetComponent<WorldItem>());
 	}
 
+	public bool AllowProduction { get; private set; }
+
 	public void ToogleProduction(bool v)
 	{
-		if(!Building) {
-			return;
-		}
-		Factory factory = Building.GetComponent<Factory>();
-		if(factory) {
-			factory.enableConstruction = v;
-		}
+		AllowProduction = v;
 	}
 
 	public bool AllowMining { get; private set; }

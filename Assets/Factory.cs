@@ -15,10 +15,12 @@ public class Factory : MonoBehaviour {
 
 	GameObject construct;
 
+	World world;
+
 	// Use this for initialization
 	void Start()
 	{
-	
+		world = this.GetComponent<WorldItem>().world;
 	}
 	
 	// Update is called once per frame
@@ -36,23 +38,24 @@ public class Factory : MonoBehaviour {
 		construct = (GameObject)Instantiate(pfBlueprint);
 		construct.transform.parent = this.transform;
 		construct.transform.localPosition = createPoint;
+		construct.transform.localScale = 0.1f * Vector3.one;
 		foreach(var s in construct.GetComponents<MonoBehaviour>()) {
 			s.enabled = false;
 		}
 		// construction
 		float t = constructionRate;
 		while(t > 0) {
-			if(enableConstruction) {
+			if(world.AllowProduction) {
 				t -= Time.deltaTime;
 				float p = 1.0f - t / constructionRate;
-				construct.transform.localScale = p * Vector3.one;
+				construct.transform.localScale = (0.1f+0.9f*p) * Vector3.one;
 			}
 			yield return null;
 		}
 		// let loose
 		construct.transform.localPosition = exitPoint;
-		construct.transform.parent = null;
-		this.GetComponent<WorldItem>().world.Add(construct.GetComponent<WorldItem>());
+		construct.transform.parent = world.transform;
+		world.Add(construct.GetComponent<WorldItem>());
 		foreach(var s in construct.GetComponents<MonoBehaviour>()) {
 			s.enabled = true;
 		}

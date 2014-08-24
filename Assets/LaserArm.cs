@@ -15,10 +15,14 @@ public class LaserArm : MonoBehaviour {
 
 	public Destroyable Target { get; set; }
 
-	// Use this for initialization
-	void Start () {
+	void Awake()
+	{
 		laser = GetComponentInChildren<LineRenderer>();
 		LaserEnabled = false;
+	}
+
+	// Use this for initialization
+	void Start () {
 	}
 	
 	// Update is called once per frame

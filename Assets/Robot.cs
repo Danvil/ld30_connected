@@ -19,14 +19,17 @@ public class Robot : MonoBehaviour {
 
 	enum Status { Failure, Success, Running };
 
-	// Use this for initialization
-	void Start ()
+	void Awake()
 	{
 		falling = GetComponent<Falling>();
 		laser = GetComponentInChildren<LaserArm>();
 		trunk = GetComponentInChildren<Trunk>();
-		world = GetComponent<WorldItem>().world;
+	}
 
+	// Use this for initialization
+	void Start ()
+	{
+		world = GetComponent<WorldItem>().world;
 		GlobalInterface.Singleton.NumRobots += 1;
 	}
 
@@ -189,7 +192,7 @@ public class Robot : MonoBehaviour {
 
 	bool HaulActionIsPickableInRange()
 	{
-		return (this.transform.position - haulTarget.transform.position).magnitude <= maxHaulDist;
+		return (this.transform.position.xz() - haulTarget.transform.position.xz()).magnitude <= maxHaulDist;
 	}
 
 	bool HaulActionMoveToPickable()
@@ -230,7 +233,7 @@ public class Robot : MonoBehaviour {
 	
 	bool DesintegrateActionIsDestroyableInRange()
 	{
-		return (this.transform.position - laserTarget.transform.position).magnitude <= maxLaserDist;
+		return (this.transform.position.xz() - laserTarget.transform.position.xz()).magnitude <= maxLaserDist;
 	}
 
 	bool DesintegrateActionMoveToDestroyable()
@@ -328,7 +331,7 @@ public class Robot : MonoBehaviour {
 	{
 		Vector3 dir = goal - this.transform.position;
 		dir.y = 0.0f;
-		return (dir.magnitude <= distToGoal);
+		return (dir.magnitude <= distToGoal + 1.0f/20.0f * speed);
 	}
 
 	bool MoveActionMoveToGoal()
@@ -337,11 +340,11 @@ public class Robot : MonoBehaviour {
 		dir.y = 0.0f;
 		// move to goal
 		heading = Mathf.Atan2(dir.x,dir.z) * Mathf.Rad2Deg;
-		Vector3 newpos = this.transform.position + Time.deltaTime * speed * dir.normalized;
+		Vector3 newpos = this.transform.localPosition + Time.deltaTime * speed * dir.normalized;
 		if(!falling || falling.CheckIfSafe(newpos)) {
 			//newpos.y = topVoxel.z + 1.5f;
 			goal.y = newpos.y;
-			this.transform.position = newpos;
+			this.transform.localPosition = newpos;
 			SetRotation(heading);
 			// still moving
 			return true;

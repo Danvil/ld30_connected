@@ -53,10 +53,14 @@ public class GlobalInterface : MonoBehaviour {
 			txtGoo.text = string.Format("Goo: {0:0.0}", numGoo);
 		}
 	}
+
+	void Awake()
+	{
+		Singleton = this;
+	}
 	
 	// Use this for initialization
 	void Start () {
-		Singleton = this;
 		NumWorlds = 0;
 		NumRobots = 0;
 		NumMinerals = 0;

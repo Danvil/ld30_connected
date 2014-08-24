@@ -32,6 +32,8 @@ public class WorldInterface : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		GetComponentInChildren<UnityEngine.Canvas>().worldCamera = WorldSelector.Singleton.camera;
+
 		btnFactory = this.transform.FindChild("ButtonFactory").GetComponent<UnityEngine.UI.Button>();
 		btnFactory.onClick.AddListener(BuildFactory);
 

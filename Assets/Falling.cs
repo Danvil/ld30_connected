@@ -33,7 +33,7 @@ public class Falling : MonoBehaviour {
 	void Update()
 	{
 		// position
-		Vector3 pos = this.transform.position;
+		Vector3 pos = this.transform.localPosition;
 		Int3 ipos = pos.ToInt3();
 		// find top voxel
 		//if(ipos != lastVoxelPos) {
@@ -57,6 +57,6 @@ public class Falling : MonoBehaviour {
 			}
 			velocity = Vector3.zero;
 		}
-		this.transform.position = pos;
+		this.transform.localPosition = pos;
 	}
 }

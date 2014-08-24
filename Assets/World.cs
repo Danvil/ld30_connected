@@ -180,6 +180,7 @@ public class World : MonoBehaviour {
 	void Start () {
 		Generate();
 		GlobalInterface.Singleton.NumWorlds += 1;
+		WorldSelector.Singleton.AddWorld(this);
 	}
 	
 	// Update is called once per frame

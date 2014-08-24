@@ -4,6 +4,8 @@ using System.Collections;
 [RequireComponent(typeof(WorldItem))]
 public class Destroyable : MonoBehaviour {
 
+	WorldItem wi;
+
 	public GameObject pfDropping;
 
 	public float dropAmount = 1.0f;
@@ -21,14 +23,16 @@ public class Destroyable : MonoBehaviour {
 		get { return Health <= 0.0f; }
 	}
 
-	WorldItem wi;
-
 	bool hasDropped = false;
+
+	void Awake()
+	{
+		wi = GetComponent<WorldItem>();
+	}
 
 	// Use this for initialization
 	void Start()
 	{
-		wi = GetComponent<WorldItem>();
 		Health = maxHealth;
 	}
 	
@@ -54,10 +58,7 @@ public class Destroyable : MonoBehaviour {
 	}
 
 	IEnumerator Fade() {
-		Robot r = GetComponent<Robot>();
-		if(r) {
-			r.MoveToSpace();
-		}
+		wi.MoveToSpace();
 		// stop all scripts
 		this.enabled = false;
 		// fade out

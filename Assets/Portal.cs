@@ -31,7 +31,7 @@ public class Portal : MonoBehaviour {
 		if(!robot) {
 			return;
 		}
-		robot.MoveToSpace();
+		robot.GetComponent<WorldItem>().MoveToSpace();
 		System.Action<Robot> final = r => {
 			robots[rt].Add(robot);
 			UpdateNumText(rt);
@@ -56,8 +56,7 @@ public class Portal : MonoBehaviour {
 		robots[rt].Remove(robot);
 		UpdateNumText(rt);
 		System.Action<Robot> final = r => {
-			var w = WorldGroup.World;
-			robot.MoveToWorld(w);
+			robot.GetComponent<WorldItem>().MoveToWorld(WorldGroup.World);
 		};
 		StartCoroutine("Beam", 
 			new object[3]{ robot, transform.position + swirlPoint, final});

@@ -13,6 +13,9 @@ public class Factory : MonoBehaviour {
 
 	public bool enableConstruction = true;
 
+	public float costsMinerals = 10.0f;
+	public float costsGoo = 5.0f;
+
 	GameObject construct;
 
 	World world;
@@ -27,7 +30,12 @@ public class Factory : MonoBehaviour {
 	void Update()
 	{
 		if(enableConstruction && !construct && pfBlueprint) {
-			StartCoroutine("Construct");
+			var gis = GlobalInterface.Singleton;
+			if(gis.NumMinerals >= costsMinerals && gis.NumGoo >= costsGoo) {
+				gis.NumMinerals -= costsMinerals;
+				gis.NumGoo -= costsGoo;
+				StartCoroutine("Construct");
+			}
 		}
 	}
 
@@ -56,9 +64,10 @@ public class Factory : MonoBehaviour {
 		// let loose
 		construct.transform.localPosition = exitPoint;
 		construct.transform.parent = world.transform;
+		WorldItem wi = construct.GetComponent<WorldItem>();
+		wi.MoveToWorld(world);
 		Robot robot = construct.GetComponent<Robot>();
 		robot.Team = world.WorldGroup.Team;
-		robot.MoveToWorld(world);
 		foreach(var s in construct.GetComponents<MonoBehaviour>()) {
 			s.enabled = true;
 		}

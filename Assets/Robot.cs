@@ -5,9 +5,10 @@ using System.Linq;
 
 public enum RobType { HAUL, LASER };
 
+[RequireComponent(typeof(WorldItem))]
 public class Robot : MonoBehaviour {
 
-	World world;
+	WorldItem wi;
 
 	public float speed = 1.70f;
 	public float distToGoal = 0.07f;
@@ -45,6 +46,7 @@ public class Robot : MonoBehaviour {
 
 	void Awake()
 	{
+		wi = GetComponent<WorldItem>();
 		falling = GetComponent<Falling>();
 		laser = GetComponentInChildren<LaserArm>();
 		trunk = GetComponentInChildren<Trunk>();
@@ -61,30 +63,10 @@ public class Robot : MonoBehaviour {
 		GlobalInterface.Singleton.NumRobots -= 1;
 	}
 
-	public void MoveToSpace()
-	{
-		world.Remove(this.GetComponent<WorldItem>());
-		world = null;
-		var fall = GetComponent<Falling>();
-		fall.enabled = true;
-		fall.world = null;
-	}
-
-	public void MoveToWorld(World w)
-	{
-		world = w;
-		this.transform.parent = w.transform;
-		world.Add(this.GetComponent<WorldItem>());
-		var fall = GetComponent<Falling>();
-		fall.enabled = true;
-		fall.world = w;
-		SetNewPosition(this.transform.position);
-	}
-
 	// Update is called once per frame
 	void Update()
 	{
-		if(!world) {
+		if(!wi.world) {
 			return;
 		}
 		// falling
@@ -167,10 +149,10 @@ public class Robot : MonoBehaviour {
 		if(!trunk.IsFull) {
 			return false;
 		}
-		if(!world.Building) {
+		if(!wi.world.Building) {
 			return false;
 		}
-		haulDropoff = world.Building.GetComponent<ResourceDropoff>();
+		haulDropoff = wi.world.Building.GetComponent<ResourceDropoff>();
 		return (haulDropoff != null);
 	}
 
@@ -193,10 +175,10 @@ public class Robot : MonoBehaviour {
 
 	bool HaulActionIsDropoffInRange()
 	{
-		if(!world.Building) {
+		if(!wi.world.Building) {
 			return false;
 		}
-		haulDropoff = world.Building.GetComponent<ResourceDropoff>();
+		haulDropoff = wi.world.Building.GetComponent<ResourceDropoff>();
 		if(!haulDropoff) {
 			return false;
 		}
@@ -227,13 +209,13 @@ public class Robot : MonoBehaviour {
 			return false;
 		}
 		// find hightest value
-		haulTarget = world
+		haulTarget = wi.world
 			.FindTopObjects<Pickable>(this.transform.position, searchRadius)
 			.Where(x => x != null && !x.Depleted)
 			.FindBest(this.transform.position, t => trunk.MaxCanLoad(t));			
 		// haulTarget = null;
 		// float score = 0.0f;
-		// foreach(Pickable t in world.FindTopObjects<Pickable>(this.transform.position, searchRadius)) {
+		// foreach(Pickable t in wi.world.FindTopObjects<Pickable>(this.transform.position, searchRadius)) {
 		// 	if(t && !t.Depleted) {
 		// 		float currentValue = trunk.MaxCanLoad(t.type, t.Amount);
 		// 		float currentDist = 1.0f + (t.transform.position.xz() - this.transform.position.xz()).magnitude;
@@ -313,7 +295,7 @@ public class Robot : MonoBehaviour {
 		if(x == null || x.Dead) {
 			return false;
 		}
-		if(world.WorldGroup.Team != this.team) {
+		if(wi.world.WorldGroup.Team != this.team) {
 			// conquer the planet!
 			Robot r = x.GetComponent<Robot>();
 			if(r) {
@@ -334,7 +316,7 @@ public class Robot : MonoBehaviour {
 			if(this.Team == Team.NEUTRAL) {
 				return false;
 			}
-			return world.AllowMining;
+			return wi.world.AllowMining;
 		}
 	}
 
@@ -342,12 +324,12 @@ public class Robot : MonoBehaviour {
 	{
 		desintegrateCooldown -= Time.deltaTime;
 		// find hightest value
-		laserTarget = world
+		laserTarget = wi.world
 			.FindTopObjects<Destroyable>(this.transform.position, searchRadius)
 			.Where(ValidDesintegrateDestroyable)
 			.FindBest(this.transform.position, x => x.dropAmount);			
 		// float score = 0.0f;
-		// foreach(Destroyable t in world.FindTopObjects<Destroyable>(this.transform.position, searchRadius)) {
+		// foreach(Destroyable t in wi.world.FindTopObjects<Destroyable>(this.transform.position, searchRadius)) {
 		// 	if(t && !t.Dead) {
 		// 		float currentValue = t.dropAmount;
 		// 		float currentDist = 1.0f + (t.transform.position.xz() - this.transform.position.xz()).magnitude;

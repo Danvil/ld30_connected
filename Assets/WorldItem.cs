@@ -5,6 +5,32 @@ public class WorldItem : MonoBehaviour {
 
 	public World world;
 
+	public void MoveToSpace()
+	{
+		this.transform.parent = null;
+		world.Remove(this);
+		world = null;
+		var fall = GetComponent<Falling>();
+		if(fall) {
+			fall.enabled = false;
+		}
+	}
+
+	public void MoveToWorld(World w)
+	{
+		world = w;
+		this.transform.parent = world.transform;
+		world.Add(this);
+		var fall = GetComponent<Falling>();
+		if(fall) {
+			fall.enabled = true;
+		}
+		var robot = GetComponent<Robot>();
+		if(robot) {
+			robot.SetNewPosition(this.transform.position);
+		}
+	}
+
 	// Use this for initialization
 	void Start () {
 	}

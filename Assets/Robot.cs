@@ -225,7 +225,7 @@ public class Robot : MonoBehaviour {
 
 	bool DesintegrateActionHasValidDestroyable()
 	{
-		return laserTarget && !laserTarget.Dead;
+		return laserTarget && !laserTarget.Dead && world.AllowMining;
 	}
 	
 	bool DesintegrateActionIsDestroyableInRange()
@@ -254,7 +254,7 @@ public class Robot : MonoBehaviour {
 		// find hightest value
 		laserTarget = world
 			.FindTopObjects<Destroyable>(this.transform.position, searchRadius)
-			.Where(x => x != null && !x.Dead)
+			.Where(x => x != null && !x.Dead && world.AllowMining)
 			.FindBest(this.transform.position, x => x.dropAmount);			
 		// float score = 0.0f;
 		// foreach(Destroyable t in world.FindTopObjects<Destroyable>(this.transform.position, searchRadius)) {

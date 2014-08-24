@@ -73,6 +73,13 @@ public class World : MonoBehaviour {
 		}
 	}
 
+	public bool AllowMining { get; private set; }
+
+	public void ToogleMining(bool v)
+	{
+		AllowMining = v;
+	}
+
 	public IEnumerable<WorldItem> FindTopObjects(Vector3 pos, float r)
 	{
 		foreach(var x in objects) {

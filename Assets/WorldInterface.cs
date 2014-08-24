@@ -33,13 +33,20 @@ public class WorldInterface : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		btnFactory = this.transform.FindChild("ButtonFactory").GetComponent<UnityEngine.UI.Button>();
-		btnDriller = this.transform.FindChild("ButtonDriller").GetComponent<UnityEngine.UI.Button>();
-		tglProduction = this.transform.FindChild("ToggleProduction").GetComponent<UnityEngine.UI.Toggle>();
-		tglMining = this.transform.FindChild("ToggleMining").GetComponent<UnityEngine.UI.Toggle>();
 		btnFactory.onClick.AddListener(BuildFactory);
+
+		btnDriller = this.transform.FindChild("ButtonDriller").GetComponent<UnityEngine.UI.Button>();
 		btnDriller.onClick.AddListener(BuildDriller);
+
+		tglProduction = this.transform.FindChild("ToggleProduction").GetComponent<UnityEngine.UI.Toggle>();
 		tglProduction.onValueChanged.AddListener(ToogleProduction);
+		ToogleProduction(tglProduction.IsActive());
+
+		tglMining = this.transform.FindChild("ToggleMining").GetComponent<UnityEngine.UI.Toggle>();
 		tglMining.onValueChanged.AddListener(ToogleMining);
+		ToogleMining(tglMining.IsActive());
+
+
 	}
 	
 	// Update is called once per frame

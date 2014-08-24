@@ -42,6 +42,23 @@ public class Trunk : MonoBehaviour {
 		}
 	}
 
+	public float MaxCanLoad(Pickable p)
+	{
+		if(load == 0.0f || p.type == Type) {
+			return Mathf.Min(RemainingCapacity, p.Amount);
+		}
+		else {
+			return 0.0f;
+		}
+	}
+
+	void SetLoadHeight()
+	{
+		Vector3 pos = this.transform.localPosition;
+		pos.y = 0.5f * LoadPercent;
+		this.transform.localPosition = pos;
+	}
+
 	public float Load(PickableType type, float v)
 	{
 		if(load == 0.0f || type == Type) {
@@ -50,14 +67,20 @@ public class Trunk : MonoBehaviour {
 				Type = type;
 			}
 			load += delta;
-			Vector3 pos = this.transform.localPosition;
-			pos.y = 0.5f * LoadPercent;
-			this.transform.localPosition = pos;
+			SetLoadHeight();
 			return delta;
 		}
 		else {
 			return 0.0f;
 		}
+	}
+
+	public float Unload(float v)
+	{
+		float delta = Mathf.Min(v, load);
+		load -= delta;
+		SetLoadHeight();
+		return delta;
 	}
 
 	public float LoadPercent
@@ -73,6 +96,11 @@ public class Trunk : MonoBehaviour {
 	public bool IsFull
 	{
 		get { return LoadPercent == 1.0f; }
+	}
+
+	public bool IsEmpty
+	{
+		get { return LoadPercent == 0.0f; }
 	}
 
 	// Use this for initialization

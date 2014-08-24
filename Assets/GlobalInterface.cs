@@ -16,6 +16,7 @@ public class GlobalInterface : MonoBehaviour {
 		get { return numWorlds; }
 		set {
 			numWorlds = value;
+			if(!txtWorlds) return;
 			txtWorlds.text = string.Format("Worlds: {0}", numWorlds);
 		}
 	}
@@ -26,6 +27,7 @@ public class GlobalInterface : MonoBehaviour {
 		get { return numRobots; }
 		set {
 			numRobots = value;
+			if(!txtRobots) return;
 			txtRobots.text = string.Format("Robots: {0}", numRobots);
 		}
 	}
@@ -36,6 +38,7 @@ public class GlobalInterface : MonoBehaviour {
 		get { return numMinerals; }
 		set {
 			numMinerals = value;
+			if(!txtMinerals) return;
 			txtMinerals.text = string.Format("Minerals: {0:0.0}", numMinerals);
 		}
 	}
@@ -46,6 +49,7 @@ public class GlobalInterface : MonoBehaviour {
 		get { return numGoo; }
 		set {
 			numGoo = value;
+			if(!txtGoo) return;
 			txtGoo.text = string.Format("Goo: {0:0.0}", numGoo);
 		}
 	}

@@ -5,6 +5,27 @@ using System.Linq;
 
 public static class MathTools
 {
+	public static T FindBest<T>(this IEnumerable<T> items, Vector3 pos, System.Func<T,float> fval) where T : Component
+	{
+		T best = null;
+		float score = 0.0f;
+		foreach(T t in items) {
+			float currentValue = fval(t);
+			float currentDist = 1.0f + (t.transform.position.xz() - pos.xz()).magnitude;
+			float currentScore = currentValue / currentDist;
+			if(best == null || currentScore > score) {
+				score = currentScore;
+				best = t;
+			}
+		}
+		return best;
+	}
+
+	public static Vector2 xz(this Vector3 a)
+	{
+		return new Vector2(a.x, a.z);
+	}
+
 	public static Vector3 Limit(this Vector3 v, float maxlen)
 	{
 		if(maxlen == 0.0f) {

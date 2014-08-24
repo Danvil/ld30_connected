@@ -5,6 +5,11 @@ public class ResourceDropoff : MonoBehaviour {
 
 	public Vector3 dropOffPoint = Vector3.zero;
 
+	public Vector3 DropOffPointWorld
+	{
+		get { return this.transform.position + dropOffPoint; }
+	}
+
 	// Use this for initialization
 	void Start () {
 	

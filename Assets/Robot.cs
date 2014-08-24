@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
+public enum RobType { HAUL, LASER };
+
 public class Robot : MonoBehaviour {
 
 	World world;
@@ -16,6 +18,8 @@ public class Robot : MonoBehaviour {
 	public float maxHaulDist = 1.0f;
 
 	public float searchRadius = 4.0f;
+
+	public RobType robType;
 
 	enum Status { Failure, Success, Running };
 
@@ -58,9 +62,27 @@ public class Robot : MonoBehaviour {
 		GlobalInterface.Singleton.NumRobots -= 1;
 	}
 
+	public void MoveToSpace()
+	{
+		world.Remove(this.GetComponent<WorldItem>());
+		world = null;
+		GetComponent<Falling>().enabled = false;
+	}
+
+	public void MoveToWorld(World w)
+	{
+		world = w;
+		this.transform.parent = w.transform;
+		world.Add(this.GetComponent<WorldItem>());
+		GetComponent<Falling>().enabled = true;
+	}
+
 	// Update is called once per frame
 	void Update()
 	{
+		if(!world) {
+			return;
+		}
 		// falling
 		if(FallActionIsFalling()) {
 			if(FallActionRun()) {

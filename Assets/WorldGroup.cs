@@ -51,13 +51,18 @@ public class WorldGroup : MonoBehaviour {
 	void UpdateAllegiance()
 	{
 		// count robots
-		int numRed = 0, numBlue = 0;
+		int numRed = 0, numBlue = 0, numNeutral = 0;
 		foreach(var r in World.FindRobots()) {
 			if(r.Team == Team.RED) numRed ++;
 			if(r.Team == Team.BLUE) numBlue ++;
+			if(r.Team == Team.NEUTRAL) numNeutral ++;
 		}
 		// balance
+		int total = numRed + numBlue + numNeutral;
 		int balance = numBlue - numRed;
+		if(numBlue != total && numRed != total) {
+			balance = 0;
+		}
 		float delta = allegianceRate * (float)balance;
 		Allegiance += delta;
 		if(Allegiance <= -1.0f) {
@@ -72,13 +77,18 @@ public class WorldGroup : MonoBehaviour {
 		Portal.SetColor(AllegianceColor);
 	}
 
-	// Use this for initialization
-	void Start () {
+	void Awake()
+	{
 		World = GetComponentInChildren<World>();
 		World.WorldGroup = this;
 		Portal = GetComponentInChildren<Portal>();
+		Portal.WorldGroup = this;
 		gui = GetComponentInChildren<WorldInterface>();
 		gui.world = World;
+	}
+
+	// Use this for initialization
+	void Start () {
 	}
 	
 	// Update is called once per frame

@@ -34,17 +34,17 @@ public class WorldInterface : MonoBehaviour {
 	void Start () {
 		GetComponentInChildren<UnityEngine.Canvas>().worldCamera = WorldSelector.Singleton.camera;
 
-		btnFactory = this.transform.FindChild("ButtonFactory").GetComponent<UnityEngine.UI.Button>();
+		btnFactory = this.transform.Search("ButtonFactory").GetComponent<UnityEngine.UI.Button>();
 		btnFactory.onClick.AddListener(BuildFactory);
 
-		btnDriller = this.transform.FindChild("ButtonDriller").GetComponent<UnityEngine.UI.Button>();
+		btnDriller = this.transform.Search("ButtonDriller").GetComponent<UnityEngine.UI.Button>();
 		btnDriller.onClick.AddListener(BuildDriller);
 
-		tglProduction = this.transform.FindChild("ToggleProduction").GetComponent<UnityEngine.UI.Toggle>();
+		tglProduction = this.transform.Search("ToggleProduction").GetComponent<UnityEngine.UI.Toggle>();
 		tglProduction.onValueChanged.AddListener(ToogleProduction);
 		ToogleProduction(tglProduction.IsActive());
 
-		tglMining = this.transform.FindChild("ToggleMining").GetComponent<UnityEngine.UI.Toggle>();
+		tglMining = this.transform.Search("ToggleMining").GetComponent<UnityEngine.UI.Toggle>();
 		tglMining.onValueChanged.AddListener(ToogleMining);
 		ToogleMining(tglMining.IsActive());
 

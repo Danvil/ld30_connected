@@ -5,6 +5,20 @@ using System.Linq;
 
 public static class MathTools
 {
+	public static Transform Search(this Transform target, string name)
+	{
+		if (target.name == name) return target;
+		
+		for (int i = 0; i < target.childCount; ++i)
+		{
+			var result = Search(target.GetChild(i), name);
+			
+			if (result != null) return result;
+		}
+		
+		return null;
+	}
+
 	public static T FindBest<T>(this IEnumerable<T> items, Vector3 pos, System.Func<T,float> fval) where T : Component
 	{
 		T best = null;
@@ -85,6 +99,7 @@ public static class MathTools
 		if(n == 0) {
 			// error
 			Debug.Log("ERROR in RandomSample");
+			return default(T);
 		}
 		return v[RandomIndex(n)];
 	}
@@ -100,6 +115,7 @@ public static class MathTools
 		if(n > max) {
 			// error
 			Debug.Log("ERROR in RandomSample");
+			return new T[] {};
 		}
 		return v.Shuffle().Take(n);
 	}

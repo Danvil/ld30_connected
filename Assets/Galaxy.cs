@@ -48,7 +48,7 @@ public class Galaxy : MonoBehaviour {
 		for(int i=-1; i<=+1; i++) {
 			GameObject go = (GameObject)Instantiate(pfWorld);
 			go.transform.position = new Vector3(SPACE*i,0,0);
-			WorldGroup wg = go.GetComponentInChildren<WorldGroup>();
+			WorldGroup wg = go.GetComponent<WorldGroup>();
 			wg.Team = Team.NEUTRAL;
 			AddWorld(wg);
 		}

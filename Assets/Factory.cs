@@ -30,10 +30,10 @@ public class Factory : MonoBehaviour {
 	void Update()
 	{
 		if(enableConstruction && !construct && pfBlueprint) {
-			var gis = GlobalInterface.Singleton;
-			if(gis.NumMinerals >= costsMinerals && gis.NumGoo >= costsGoo) {
-				gis.NumMinerals -= costsMinerals;
-				gis.NumGoo -= costsGoo;
+			var res = GlobalInterface.Singleton.GetTeamRessources(world.WorldGroup.Team);
+			if(res.numMinerals >= costsMinerals && res.numGoo >= costsGoo) {
+				res.numMinerals -= costsMinerals;
+				res.numGoo -= costsGoo;
 				StartCoroutine("Construct");
 			}
 		}

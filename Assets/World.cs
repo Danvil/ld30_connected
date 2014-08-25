@@ -166,7 +166,7 @@ public class World : MonoBehaviour {
 			go.transform.parent = this.transform;
 			WorldItem wi = go.GetComponent<WorldItem>();
 			wi.MoveToWorld(this);
-			wi.Team = WorldGroup.Team;
+			wi.Team = initRobotTeam;
 			go.GetComponent<Falling>().SetNewLocalPosition(p.ToVector3() + new Vector3(0.5f,1,0.5f));
 			Robot rob =	go.GetComponent<Robot>();
 			rob.SetRandomGoal();
@@ -177,7 +177,7 @@ public class World : MonoBehaviour {
 			go.transform.parent = this.transform;
 			WorldItem wi = go.GetComponent<WorldItem>();
 			wi.MoveToWorld(this);
-			wi.Team = WorldGroup.Team;
+			wi.Team = initRobotTeam;
 			go.GetComponent<Falling>().SetNewLocalPosition(p.ToVector3() + new Vector3(0.5f,1,0.5f));
 			Robot rob =	go.GetComponent<Robot>();
 			rob.SetRandomGoal();
@@ -197,12 +197,11 @@ public class World : MonoBehaviour {
 		Add(go.GetComponent<WorldItem>());
 	}
 
+	public Team initRobotTeam = Team.NEUTRAL;
+
 	// Use this for initialization
 	void Start () {
 		Generate();
-		if(WorldGroup.Team == Globals.Singleton.playerTeam) {
-			GlobalInterface.Singleton.NumWorlds += 1;
-		}
 	}
 	
 	// Update is called once per frame

@@ -52,13 +52,13 @@ public class Robot : MonoBehaviour {
 	void Start ()
 	{
 		if(wi.Team == Globals.Singleton.playerTeam)
-			GlobalInterface.Singleton.NumRobots += 1;
+			GlobalInterface.Singleton.GetTeamRessources(wi.Team).numRobots += 1;
 	}
 
 	void OnDestroy()
 	{
 		if(wi.Team == Globals.Singleton.playerTeam)
-			GlobalInterface.Singleton.NumRobots -= 1;
+			GlobalInterface.Singleton.GetTeamRessources(wi.Team).numRobots -= 1;
 	}
 
 	// Update is called once per frame
@@ -188,10 +188,10 @@ public class Robot : MonoBehaviour {
 	{
 		float delta = trunk.Unload(Time.deltaTime * trunk.loadRate);
 		if(trunk.Type == PickableType.GOO) {
-			GlobalInterface.Singleton.NumGoo += delta;
+			GlobalInterface.Singleton.GetTeamRessources(wi.Team).numGoo += delta;
 		}
 		if(trunk.Type == PickableType.MINERALS) {
-			GlobalInterface.Singleton.NumMinerals += delta;
+			GlobalInterface.Singleton.GetTeamRessources(wi.Team).numMinerals += delta;
 		}
 		return true;
 	}

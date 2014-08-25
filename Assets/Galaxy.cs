@@ -70,8 +70,8 @@ public class Galaxy : MonoBehaviour {
 			}
 		}
 
-		worlds[0].Team = Globals.Singleton.playerTeam;
-		worlds[3].Team = Globals.Singleton.nonPlayerTeam;
+		worlds[0].World.initRobotTeam = Globals.Singleton.playerTeam;
+		worlds[3].World.initRobotTeam = Globals.Singleton.nonPlayerTeam;
 
 		AddConnection(worlds[0], worlds[1]);
 		AddConnection(worlds[0], worlds[2]);

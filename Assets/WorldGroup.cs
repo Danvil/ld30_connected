@@ -71,11 +71,15 @@ public class WorldGroup : MonoBehaviour {
 			Allegiance += delta;
 			if(Allegiance <= -1.0f) {
 				Allegiance = -1.0f;
+				GlobalInterface.Singleton.GetTeamRessources(Team).numWorlds --;
 				Team = Team.RED;
+				GlobalInterface.Singleton.GetTeamRessources(Team).numWorlds ++;
 			}
 			if(Allegiance >= 1.0f) {
 				Allegiance = 1.0f;
+				GlobalInterface.Singleton.GetTeamRessources(Team).numWorlds --;
 				Team = Team.BLUE;
+				GlobalInterface.Singleton.GetTeamRessources(Team).numWorlds ++;
 			}
 			// update color
 			Color newColor = AllegianceColor;

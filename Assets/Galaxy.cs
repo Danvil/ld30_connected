@@ -30,6 +30,20 @@ public class Galaxy : MonoBehaviour {
 		connections.Add(c);
 	}
 
+	public IEnumerable<WorldGroup> GetWorlds()
+	{
+		return worlds;
+	}
+
+	public IEnumerable<Connection> GetConnections(WorldGroup w)
+	{
+		foreach(var c in connections) {
+			if(c.a == w || c.b == w) {
+				yield return c;
+			}
+		} 
+	}
+
 	public Vector3 WorldsMeanPoint()
 	{
 		return worlds.Select(w => w.World.transform.position).Aggregate((a,b)=>a+b) / (float)worlds.Count;

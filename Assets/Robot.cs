@@ -10,6 +10,8 @@ public class Robot : MonoBehaviour {
 
 	WorldItem wi;
 
+	const float FIND_TOP_OBJS_COOLDOWN = 0.25f;
+
 	public float speed = 1.70f;
 	public float distToGoal = 0.07f;
 	public float fallingSpinAngularVelocity = 90.0f;
@@ -203,29 +205,25 @@ public class Robot : MonoBehaviour {
 		return haulTarget && !haulTarget.Depleted && trunk.MaxCanLoad(haulTarget) > 0;
 	}
 
+	float actionHaulReselectCooldown = 0.0f;
+
 	bool ActionHaulSelectPickable()
 	{
 		if(trunk.IsFull) {
 			return false;
 		}
-		// find hightest value
-		haulTarget = wi.world
-			.FindTopObjects<Pickable>(this.transform.position, searchRadius)
-			.Where(x => x != null && !x.Depleted)
-			.FindBest(this.transform.position, t => trunk.MaxCanLoad(t));			
-		// haulTarget = null;
-		// float score = 0.0f;
-		// foreach(Pickable t in wi.world.FindTopObjects<Pickable>(this.transform.position, searchRadius)) {
-		// 	if(t && !t.Depleted) {
-		// 		float currentValue = trunk.MaxCanLoad(t.type, t.Amount);
-		// 		float currentDist = 1.0f + (t.transform.position.xz() - this.transform.position.xz()).magnitude;
-		// 		float currentScore = currentValue / currentDist;
-		// 		if(haulTarget == null || currentScore > score) {
-		// 			score = currentScore;
-		// 			haulTarget = t;
-		// 		}
-		// 	}
-		// }
+		actionHaulReselectCooldown -= Time.deltaTime;
+		if(actionHaulReselectCooldown < 0.0f) {
+			// find hightest value
+			haulTarget = wi.world
+				.FindTopObjects<Pickable>(this.transform.position, searchRadius)
+				.Where(x => x != null && !x.Depleted)
+				.FindBest(this.transform.position, t => trunk.MaxCanLoad(t));
+			actionHaulReselectCooldown = FIND_TOP_OBJS_COOLDOWN;
+		}
+		else {
+			haulTarget = null;
+		}
 		return haulTarget;
 	}
 
@@ -320,26 +318,23 @@ public class Robot : MonoBehaviour {
 		}
 	}
 
+	float desintegrateActionReselectCooldown = 0.0f;
+
 	bool DesintegrateActionSelectDestroyable()
 	{
 		desintegrateCooldown -= Time.deltaTime;
-		// find hightest value
-		laserTarget = wi.world
-			.FindTopObjects<Destroyable>(this.transform.position, searchRadius)
-			.Where(ValidDesintegrateDestroyable)
-			.FindBest(this.transform.position, x => x.dropAmount);			
-		// float score = 0.0f;
-		// foreach(Destroyable t in wi.world.FindTopObjects<Destroyable>(this.transform.position, searchRadius)) {
-		// 	if(t && !t.Dead) {
-		// 		float currentValue = t.dropAmount;
-		// 		float currentDist = 1.0f + (t.transform.position.xz() - this.transform.position.xz()).magnitude;
-		// 		float currentScore = currentValue / currentDist;
-		// 		if(laserTarget == null || currentScore > score) {
-		// 			score = currentScore;
-		// 			laserTarget = t;
-		// 		}
-		// 	}
-		// }
+		desintegrateActionReselectCooldown -= Time.deltaTime;
+		if(desintegrateCooldown <= 0) {
+			// find hightest value
+			laserTarget = wi.world
+				.FindTopObjects<Destroyable>(this.transform.position, searchRadius)
+				.Where(ValidDesintegrateDestroyable)
+				.FindBest(this.transform.position, x => x.dropAmount);
+			desintegrateActionReselectCooldown = FIND_TOP_OBJS_COOLDOWN;
+		}
+		else {
+			laserTarget = null;
+		}
 		if(!laserTarget) {
 			return false;
 		}
@@ -381,9 +376,8 @@ public class Robot : MonoBehaviour {
 	
 	#region MoveAction
 
-	public void SetNewPosition(Vector3 p)
+	public void SetRandomGoal()
 	{
-		this.transform.position = p;
 		ActionSetRandomGoal();
 	}
 
@@ -410,10 +404,9 @@ public class Robot : MonoBehaviour {
 		// move to goal
 		heading = Mathf.Atan2(dir.x,dir.z) * Mathf.Rad2Deg;
 		Vector3 newpos = this.transform.localPosition + Time.deltaTime * speed * dir.normalized;
-		if(!falling || falling.CheckIfSafe(newpos)) {
+		if(falling.TrySetNewLocalPosition(newpos)) {
 			//newpos.y = topVoxel.z + 1.5f;
 			goal.y = newpos.y;
-			this.transform.localPosition = newpos;
 			SetRotation(heading);
 			// still moving
 			return true;

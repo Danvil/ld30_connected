@@ -24,10 +24,11 @@ public class WorldItem : MonoBehaviour {
 		var fall = GetComponent<Falling>();
 		if(fall) {
 			fall.enabled = true;
+			fall.SetNewLocalPosition(this.transform.localPosition);
 		}
 		var robot = GetComponent<Robot>();
 		if(robot) {
-			robot.SetNewPosition(this.transform.position);
+			robot.SetRandomGoal();
 		}
 	}
 

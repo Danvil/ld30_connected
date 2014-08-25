@@ -14,12 +14,27 @@ public class Falling : MonoBehaviour {
 	public bool IsFalling { get; private set; }
 
 	Vector3 velocity = Vector3.zero;
-	Int3 lastVoxelPos;
 	Int3 topVoxel;
 
-	public bool CheckIfSafe(Vector3 pos)
+	public bool TrySetNewLocalPosition(Vector3 pos)
 	{
-		return wi.world.Voxels.HasTopVoxel(pos.ToInt3());
+		Int3 newTopVoxel;
+		if(wi.world.Voxels.TryGetTopVoxel(pos.ToInt3(), out newTopVoxel)) {
+			// safe
+			topVoxel = newTopVoxel;
+			this.transform.localPosition = pos;
+			return true;
+		}
+		else {
+			// not safe
+			return false;
+		}
+	}
+
+	public void SetNewLocalPosition(Vector3 pos)
+	{
+		wi.world.Voxels.TryGetTopVoxel(pos.ToInt3(), out topVoxel);
+		this.transform.localPosition = pos;
 	}
 
 	void Awake()
@@ -38,12 +53,6 @@ public class Falling : MonoBehaviour {
 	{
 		// position
 		Vector3 pos = this.transform.localPosition;
-		Int3 ipos = pos.ToInt3();
-		// find top voxel
-		//if(ipos != lastVoxelPos) {
-			lastVoxelPos = ipos;
-			wi.world.Voxels.TryGetTopVoxel(lastVoxelPos, out topVoxel);
-		//}
 		// test if falling
 		IsFalling = (pos.y > topVoxel.z + 1.5f);
 		if(IsFalling) {

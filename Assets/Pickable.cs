@@ -39,7 +39,7 @@ public class Pickable : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		float scl1 = Mathf.Sqrt(maxAmount);
+		float scl1 = Mathf.Sqrt(0.3f*maxAmount);
 		float scl2 = 0.2f + 0.8f*Mathf.Sqrt(AmountPercent);
 		this.transform.localScale = scl1 * scl2 * Vector3.one;
 		if(Depleted) {

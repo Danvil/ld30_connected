@@ -12,7 +12,7 @@ public class Destroyable : MonoBehaviour {
 
 	public bool destroyVoxel = false;
 
-	public float decayRate = 2.0f;
+	public float deadScaleDecayRate = 2.0f;
 
 	public float maxHealth = 30.0f;
 
@@ -65,7 +65,7 @@ public class Destroyable : MonoBehaviour {
 		this.enabled = false;
 		// fade out
 		while(this.transform.localScale.magnitude > 0.1f) {
-			this.transform.localScale *= (1.0f - decayRate*Time.deltaTime);
+			this.transform.localScale *= (1.0f - deadScaleDecayRate*Time.deltaTime);
 			yield return null;
 		}
 		Destroy(this.gameObject);

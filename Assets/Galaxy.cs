@@ -43,20 +43,26 @@ public class Galaxy : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 	
-		float SPACE = 50.0f;
+		const float SPACE = 80.0f;
+		const float RND = 0.2f;
 
-		for(int i=-1; i<=+1; i++) {
-			GameObject go = (GameObject)Instantiate(pfWorld);
-			go.transform.position = new Vector3(SPACE*i,0,0);
-			WorldGroup wg = go.GetComponent<WorldGroup>();
-			wg.Team = Team.NEUTRAL;
-			AddWorld(wg);
+		for(int y=0; y<2; y++) {
+			for(int x=0; x<2; x++) {
+				GameObject go = (GameObject)Instantiate(pfWorld);
+				go.transform.position = new Vector3(SPACE*x,0,SPACE*y) + SPACE * RND * new Vector3(MathTools.Random(-1f,+1f),0,MathTools.Random(-1f,+1f));
+				WorldGroup wg = go.GetComponent<WorldGroup>();
+				wg.Team = Team.NEUTRAL;
+				AddWorld(wg);
+			}
 		}
 
-		worlds[1].Team = Globals.Singleton.playerTeam;
+		worlds[0].Team = Globals.Singleton.playerTeam;
+		worlds[3].Team = Globals.Singleton.nonPlayerTeam;
 
 		AddConnection(worlds[0], worlds[1]);
-		AddConnection(worlds[1], worlds[2]);
+		AddConnection(worlds[0], worlds[2]);
+		AddConnection(worlds[3], worlds[1]);
+		AddConnection(worlds[3], worlds[2]);
 
 	}
 	

@@ -6,6 +6,7 @@ public class Globals : MonoBehaviour {
 	public static Globals Singleton;
 
 	public Team playerTeam = Team.BLUE;
+	public Team nonPlayerTeam = Team.RED;
 
 	public Material pfTeamNeutral;
 	public Material pfTeamRed;

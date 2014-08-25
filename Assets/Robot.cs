@@ -51,12 +51,14 @@ public class Robot : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
 	{
-		GlobalInterface.Singleton.NumRobots += 1;
+		if(wi.Team == Globals.Singleton.playerTeam)
+			GlobalInterface.Singleton.NumRobots += 1;
 	}
 
 	void OnDestroy()
 	{
-		GlobalInterface.Singleton.NumRobots -= 1;
+		if(wi.Team == Globals.Singleton.playerTeam)
+			GlobalInterface.Singleton.NumRobots -= 1;
 	}
 
 	// Update is called once per frame

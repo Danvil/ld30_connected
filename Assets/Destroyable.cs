@@ -4,7 +4,7 @@ using System.Collections;
 [RequireComponent(typeof(WorldItem))]
 public class Destroyable : MonoBehaviour {
 
-	WorldItem wi;
+	public WorldItem wi { get; private set; }
 
 	public GameObject pfDropping;
 
@@ -15,6 +15,8 @@ public class Destroyable : MonoBehaviour {
 	public float decayRate = 2.0f;
 
 	public float maxHealth = 30.0f;
+
+	public bool isRobot = false;
 
 	public float Health { get; set; }
 

@@ -48,33 +48,43 @@ public class WorldGroup : MonoBehaviour {
 		}
 	}
 
-	void UpdateAllegiance()
+	const float ALLEGIANCE_UPDATE_INTERVAl = 0.5f;
+
+	IEnumerator UpdateAllegiance()
 	{
-		// count robots
-		int numRed = 0, numBlue = 0, numNeutral = 0;
-		foreach(var r in World.FindRobots()) {
-			if(r.Team == Team.RED) numRed ++;
-			if(r.Team == Team.BLUE) numBlue ++;
-			if(r.Team == Team.NEUTRAL) numNeutral ++;
+		Color lastColor = Color.black;
+		while(true) {
+			// count robots
+			int numRed = 0, numBlue = 0, numNeutral = 0;
+			foreach(var r in World.FindRobots()) {
+				if(r.wi.Team == Team.RED) numRed ++;
+				if(r.wi.Team == Team.BLUE) numBlue ++;
+				if(r.wi.Team == Team.NEUTRAL) numNeutral ++;
+			}
+			// balance
+			int total = numRed + numBlue + numNeutral;
+			int balance = numBlue - numRed;
+			if(numBlue != total && numRed != total) {
+				balance = 0;
+			}
+			float delta = ALLEGIANCE_UPDATE_INTERVAl * allegianceRate * (float)balance;
+			Allegiance += delta;
+			if(Allegiance <= -1.0f) {
+				Allegiance = -1.0f;
+				Team = Team.RED;
+			}
+			if(Allegiance >= 1.0f) {
+				Allegiance = 1.0f;
+				Team = Team.BLUE;
+			}
+			// update color
+			Color newColor = AllegianceColor;
+			if(newColor != lastColor) {
+				Portal.SetColor(newColor);
+				lastColor = newColor;
+			}
+			yield return new WaitForSeconds(ALLEGIANCE_UPDATE_INTERVAl);
 		}
-		// balance
-		int total = numRed + numBlue + numNeutral;
-		int balance = numBlue - numRed;
-		if(numBlue != total && numRed != total) {
-			balance = 0;
-		}
-		float delta = allegianceRate * (float)balance;
-		Allegiance += delta;
-		if(Allegiance <= -1.0f) {
-			Allegiance = -1.0f;
-			Team = Team.RED;
-		}
-		if(Allegiance >= 1.0f) {
-			Allegiance = 1.0f;
-			Team = Team.BLUE;
-		}
-		// update color
-		Portal.SetColor(AllegianceColor);
 	}
 
 	void Awake()
@@ -89,10 +99,10 @@ public class WorldGroup : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		StartCoroutine("UpdateAllegiance");
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		UpdateAllegiance();
 	}
 }

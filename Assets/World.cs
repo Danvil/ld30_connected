@@ -82,6 +82,8 @@ public class World : MonoBehaviour {
 
 	public GameObject Building { get; private set; }
 
+	public ResourceDropoff ResourceDropoff { get; private set; }
+
 	public void BuildFactory()
 	{
 		PlaceBuilding(pfFactory);
@@ -98,6 +100,7 @@ public class World : MonoBehaviour {
 			return;
 		}
 		Building = (GameObject)Instantiate(pf);
+		ResourceDropoff = Building.GetComponent<ResourceDropoff>();
 		int h = Voxels.GetTopVoxelHeight(Int3.Zero);
 		Building.transform.parent = this.transform;
 		Building.transform.localPosition = new Vector3(0,h+1,0);
@@ -161,20 +164,22 @@ public class World : MonoBehaviour {
 		foreach(Int3 p in Voxels.GetTopVoxels().RandomSample(numRobotsLaser)) {
 			GameObject go = (GameObject)Instantiate(pfRobotLaser);
 			go.transform.parent = this.transform;
-			go.GetComponent<WorldItem>().MoveToWorld(this);
+			WorldItem wi = go.GetComponent<WorldItem>();
+			wi.MoveToWorld(this);
+			wi.Team = WorldGroup.Team;
 			go.GetComponent<Falling>().SetNewLocalPosition(p.ToVector3() + new Vector3(0.5f,1,0.5f));
 			Robot rob =	go.GetComponent<Robot>();
-			rob.Team = WorldGroup.Team;
 			rob.SetRandomGoal();
 		}
 		// robot hauler
 		foreach(Int3 p in Voxels.GetTopVoxels().RandomSample(numRobotsHauler)) {
 			GameObject go = (GameObject)Instantiate(pfRobotHauler);
 			go.transform.parent = this.transform;
-			go.GetComponent<WorldItem>().MoveToWorld(this);
+			WorldItem wi = go.GetComponent<WorldItem>();
+			wi.MoveToWorld(this);
+			wi.Team = WorldGroup.Team;
 			go.GetComponent<Falling>().SetNewLocalPosition(p.ToVector3() + new Vector3(0.5f,1,0.5f));
 			Robot rob =	go.GetComponent<Robot>();
-			rob.Team = WorldGroup.Team;
 			rob.SetRandomGoal();
 		}
 	}

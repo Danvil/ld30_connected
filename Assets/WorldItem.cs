@@ -32,6 +32,20 @@ public class WorldItem : MonoBehaviour {
 		}
 	}
 
+	private Team team;
+
+	public Team Team {
+		get { return team; }
+		set
+		{
+			team = value;
+			Robot r = GetComponent<Robot>();
+			if(r) {
+				r.UpdateTeamColor();
+			}
+		}
+	}
+
 	// Use this for initialization
 	void Start () {
 	}

@@ -8,9 +8,9 @@ public enum RobType { HAUL, LASER };
 [RequireComponent(typeof(WorldItem))]
 public class Robot : MonoBehaviour {
 
-	WorldItem wi;
+	public WorldItem wi { get; private set; }
 
-	const float FIND_TOP_OBJS_COOLDOWN = 0.25f;
+	const float FIND_TOP_OBJS_COOLDOWN = 0.40f;
 
 	public float speed = 1.70f;
 	public float distToGoal = 0.07f;
@@ -26,24 +26,18 @@ public class Robot : MonoBehaviour {
 
 	enum Status { Failure, Success, Running };
 
-	Team team;
-	public Team Team
+	public void UpdateTeamColor()
 	{
-		get { return team; }
-		set {
-			team = value;
-			Material mat = Globals.Singleton.TeamMaterial(team);
-			Transform t;
+		Material mat = Globals.Singleton.TeamMaterial(wi.Team);
+		Transform t;
 
-			if(renderer) renderer.material = mat;
-			
-			t = this.transform.FindChild("HaulerMesh");
-			if(t) t.gameObject.renderer.material = mat;
+		if(renderer) renderer.material = mat;
+		
+		t = this.transform.FindChild("HaulerMesh");
+		if(t) t.gameObject.renderer.material = mat;
 
-			t = this.transform.FindChild("Arm");
-			if(t) t.gameObject.renderer.material = mat;
-			
-		}
+		t = this.transform.FindChild("Arm");
+		if(t) t.gameObject.renderer.material = mat;
 	}
 
 	void Awake()
@@ -154,7 +148,7 @@ public class Robot : MonoBehaviour {
 		if(!wi.world.Building) {
 			return false;
 		}
-		haulDropoff = wi.world.Building.GetComponent<ResourceDropoff>();
+		haulDropoff = wi.world.ResourceDropoff;
 		return (haulDropoff != null);
 	}
 
@@ -180,7 +174,7 @@ public class Robot : MonoBehaviour {
 		if(!wi.world.Building) {
 			return false;
 		}
-		haulDropoff = wi.world.Building.GetComponent<ResourceDropoff>();
+		haulDropoff = wi.world.ResourceDropoff;
 		if(!haulDropoff) {
 			return false;
 		}
@@ -219,7 +213,7 @@ public class Robot : MonoBehaviour {
 				.FindTopObjects<Pickable>(this.transform.position, searchRadius)
 				.Where(x => x != null && !x.Depleted)
 				.FindBest(this.transform.position, t => trunk.MaxCanLoad(t));
-			actionHaulReselectCooldown = FIND_TOP_OBJS_COOLDOWN;
+			actionHaulReselectCooldown = FIND_TOP_OBJS_COOLDOWN * MathTools.Random(0.80f,1.25f);
 		}
 		else {
 			haulTarget = null;
@@ -293,11 +287,10 @@ public class Robot : MonoBehaviour {
 		if(x == null || x.Dead) {
 			return false;
 		}
-		if(wi.world.WorldGroup.Team != this.team) {
+		if(wi.world.WorldGroup.Team != this.wi.Team) {
 			// conquer the planet!
-			Robot r = x.GetComponent<Robot>();
-			if(r) {
-				return (r.Team != this.Team);
+			if(x.isRobot) {
+				return (x.wi.Team != this.wi.Team);
 			}
 			else {
 				return false;
@@ -305,13 +298,12 @@ public class Robot : MonoBehaviour {
 		}
 		else {
 			// only attack no-team robots
-			Robot r = x.GetComponent<Robot>();
-			if(r) {
-				return (r.Team != this.Team);
+			if(x.isRobot) {
+				return (x.wi.Team != this.wi.Team);
 			}
 			// assume rest is mining
 			// neutral team does not mine
-			if(this.Team == Team.NEUTRAL) {
+			if(this.wi.Team == Team.NEUTRAL) {
 				return false;
 			}
 			return wi.world.AllowMining;
@@ -330,7 +322,7 @@ public class Robot : MonoBehaviour {
 				.FindTopObjects<Destroyable>(this.transform.position, searchRadius)
 				.Where(ValidDesintegrateDestroyable)
 				.FindBest(this.transform.position, x => x.dropAmount);
-			desintegrateActionReselectCooldown = FIND_TOP_OBJS_COOLDOWN;
+			desintegrateActionReselectCooldown = FIND_TOP_OBJS_COOLDOWN * MathTools.Random(0.80f,1.25f);
 		}
 		else {
 			laserTarget = null;

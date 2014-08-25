@@ -66,8 +66,7 @@ public class Factory : MonoBehaviour {
 		construct.transform.parent = world.transform;
 		WorldItem wi = construct.GetComponent<WorldItem>();
 		wi.MoveToWorld(world);
-		Robot robot = construct.GetComponent<Robot>();
-		robot.Team = world.WorldGroup.Team;
+		wi.Team = world.WorldGroup.Team;
 		foreach(var s in construct.GetComponents<MonoBehaviour>()) {
 			s.enabled = true;
 		}

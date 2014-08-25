@@ -26,7 +26,7 @@ public class Portal : MonoBehaviour {
 		var w = WorldGroup.World;
 		Robot robot = w
 			.FindRobots()
-			.Where(r => r.Team == team && r.robType == rt)
+			.Where(r => r.wi.Team == team && r.robType == rt)
 			.RandomSample();
 		if(!robot) {
 			return;
@@ -48,7 +48,7 @@ public class Portal : MonoBehaviour {
 	public void MoveDown(Team team, RobType rt)
 	{
 		Robot robot = robots[rt]
-			.Where(r => r.Team == team)
+			.Where(r => r.wi.Team == team)
 			.RandomSample();
 		if(!robot) {
 			return;

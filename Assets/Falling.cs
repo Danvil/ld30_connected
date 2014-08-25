@@ -16,6 +16,11 @@ public class Falling : MonoBehaviour {
 	Vector3 velocity = Vector3.zero;
 	Int3 topVoxel;
 
+	void ComputeTopVoxel()
+	{
+		wi.world.Voxels.TryGetTopVoxel(this.transform.localPosition.ToInt3(), out topVoxel);
+	}
+
 	public bool TrySetNewLocalPosition(Vector3 pos)
 	{
 		Int3 newTopVoxel;
@@ -33,8 +38,8 @@ public class Falling : MonoBehaviour {
 
 	public void SetNewLocalPosition(Vector3 pos)
 	{
-		wi.world.Voxels.TryGetTopVoxel(pos.ToInt3(), out topVoxel);
 		this.transform.localPosition = pos;
+		ComputeTopVoxel();
 	}
 
 	void Awake()
@@ -45,7 +50,9 @@ public class Falling : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
 	{
+		ComputeTopVoxel();
 		IsFalling = false;
+		StartCoroutine("UpdateTopVoxel");
 	}
 	
 	// Update is called once per frame
@@ -71,5 +78,13 @@ public class Falling : MonoBehaviour {
 			velocity = Vector3.zero;
 		}
 		this.transform.localPosition = pos;
+	}
+
+	IEnumerator UpdateTopVoxel()
+	{
+		while(true) {
+			ComputeTopVoxel();
+			yield return new WaitForSeconds(1.0f);
+		}
 	}
 }

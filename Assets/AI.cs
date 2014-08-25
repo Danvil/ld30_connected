@@ -51,8 +51,10 @@ public class AI : MonoBehaviour {
 			int numMyHaulers = 0;
 			int numMyLaser = 0;
 			foreach(var r in wg.World.FindRobots()) {
-				if(r.wi.Team == myteam && r.robType == RobType.HAUL) numMyHaulers ++;
-				if(r.wi.Team == myteam && r.robType == RobType.LASER) numMyLaser ++;
+				if(r.entity.Team == myteam && r.robType == RobType.HAUL)
+					numMyHaulers ++;
+				if(r.entity.Team == myteam && r.robType == RobType.LASER)
+					numMyLaser ++;
 			}
 			if(numMyHaulers > 5) {
 				wg.Portal.MoveUp(myteam, RobType.LASER);

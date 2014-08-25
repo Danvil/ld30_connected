@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(WorldItem))]
+[RequireComponent(typeof(Entity))]
 public class Destroyable : MonoBehaviour {
 
-	public WorldItem wi { get; private set; }
+	public Entity entity { get; private set; }
 
 	public GameObject pfDropping;
 
@@ -29,7 +29,8 @@ public class Destroyable : MonoBehaviour {
 
 	void Awake()
 	{
-		wi = GetComponent<WorldItem>();
+		entity = GetComponent<Entity>();
+		entity.destroyable = this;
 	}
 
 	// Use this for initialization
@@ -44,14 +45,14 @@ public class Destroyable : MonoBehaviour {
 		if(Dead && !hasDropped) {
 			// create drop
 			GameObject go = (GameObject)Instantiate(pfDropping);
-			go.transform.parent = wi.world.transform;
+			go.transform.parent = entity.world.transform;
 			go.transform.position = this.transform.position;
 			go.GetComponent<Pickable>().maxAmount = dropAmount;
-			wi.world.Add(go.GetComponent<WorldItem>());
+			entity.world.Add(go.GetComponent<Entity>());
 			// destroy voxel
 			if(destroyVoxel) {
 				var ip = this.transform.localPosition.ToInt3();
-				wi.world.DestroyVoxel(ip);
+				entity.world.DestroyVoxel(ip);
 			}
 			// start fading
 			StartCoroutine("Fade");
@@ -60,7 +61,7 @@ public class Destroyable : MonoBehaviour {
 	}
 
 	IEnumerator Fade() {
-		wi.MoveToSpace();
+		entity.MoveToSpace();
 		// stop all scripts
 		this.enabled = false;
 		// fade out

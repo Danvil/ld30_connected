@@ -5,10 +5,10 @@ using System.Linq;
 
 public enum RobType { HAUL, LASER };
 
-[RequireComponent(typeof(WorldItem))]
+[RequireComponent(typeof(Entity))]
 public class Robot : MonoBehaviour {
 
-	public WorldItem wi { get; private set; }
+	public Entity entity { get; private set; }
 
 	const float FIND_TOP_OBJS_COOLDOWN = 0.40f;
 
@@ -28,7 +28,7 @@ public class Robot : MonoBehaviour {
 
 	public void UpdateTeamColor()
 	{
-		Material mat = Globals.Singleton.TeamMaterial(wi.Team);
+		Material mat = Globals.Singleton.TeamMaterial(entity.Team);
 		Transform t;
 
 		if(renderer) renderer.material = mat;
@@ -42,8 +42,8 @@ public class Robot : MonoBehaviour {
 
 	void Awake()
 	{
-		wi = GetComponent<WorldItem>();
-		falling = GetComponent<Falling>();
+		entity = GetComponent<Entity>();
+		entity.robot = this;
 		laser = GetComponentInChildren<LaserArm>();
 		trunk = GetComponentInChildren<Trunk>();
 	}
@@ -51,20 +51,20 @@ public class Robot : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
 	{
-		if(wi.Team == Globals.Singleton.playerTeam)
-			GlobalInterface.Singleton.GetTeamRessources(wi.Team).numRobots += 1;
+		if(entity.Team == Globals.Singleton.playerTeam)
+			GlobalInterface.Singleton.GetTeamRessources(entity.Team).numRobots += 1;
 	}
 
 	void OnDestroy()
 	{
-		if(wi.Team == Globals.Singleton.playerTeam)
-			GlobalInterface.Singleton.GetTeamRessources(wi.Team).numRobots -= 1;
+		if(entity.Team == Globals.Singleton.playerTeam)
+			GlobalInterface.Singleton.GetTeamRessources(entity.Team).numRobots -= 1;
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
-		if(!wi.world) {
+		if(!entity.world) {
 			return;
 		}
 		// falling
@@ -122,11 +122,9 @@ public class Robot : MonoBehaviour {
 
 	#region FallAction
 
-	Falling falling;
-
 	bool FallActionIsFalling()
 	{
-		return falling && falling.IsFalling;
+		return entity.falling && entity.falling.IsFalling;
 	}
 
 	bool FallActionRun()
@@ -147,10 +145,10 @@ public class Robot : MonoBehaviour {
 		if(!trunk.IsFull) {
 			return false;
 		}
-		if(!wi.world.Building) {
+		if(!entity.world.Building) {
 			return false;
 		}
-		haulDropoff = wi.world.ResourceDropoff;
+		haulDropoff = entity.world.ResourceDropoff;
 		return (haulDropoff != null);
 	}
 
@@ -173,10 +171,10 @@ public class Robot : MonoBehaviour {
 
 	bool HaulActionIsDropoffInRange()
 	{
-		if(!wi.world.Building) {
+		if(!entity.world.Building) {
 			return false;
 		}
-		haulDropoff = wi.world.ResourceDropoff;
+		haulDropoff = entity.world.ResourceDropoff;
 		if(!haulDropoff) {
 			return false;
 		}
@@ -188,10 +186,10 @@ public class Robot : MonoBehaviour {
 	{
 		float delta = trunk.Unload(Time.deltaTime * trunk.loadRate);
 		if(trunk.Type == PickableType.GOO) {
-			GlobalInterface.Singleton.GetTeamRessources(wi.Team).numGoo += delta;
+			GlobalInterface.Singleton.GetTeamRessources(entity.Team).numGoo += delta;
 		}
 		if(trunk.Type == PickableType.MINERALS) {
-			GlobalInterface.Singleton.GetTeamRessources(wi.Team).numMinerals += delta;
+			GlobalInterface.Singleton.GetTeamRessources(entity.Team).numMinerals += delta;
 		}
 		return true;
 	}
@@ -211,8 +209,9 @@ public class Robot : MonoBehaviour {
 		actionHaulReselectCooldown -= Time.deltaTime;
 		if(actionHaulReselectCooldown < 0.0f) {
 			// find hightest value
-			haulTarget = wi.world
-				.FindTopObjects<Pickable>(this.transform.position, searchRadius)
+			haulTarget = entity.world
+				.FindTopObjects(this.transform.position, searchRadius)
+				.Select(e => e.pickable)
 				.Where(x => x != null && !x.Depleted)
 				.FindBest(this.transform.position, t => trunk.MaxCanLoad(t));
 			actionHaulReselectCooldown = FIND_TOP_OBJS_COOLDOWN * MathTools.Random(0.80f,1.25f);
@@ -289,10 +288,10 @@ public class Robot : MonoBehaviour {
 		if(x == null || x.Dead) {
 			return false;
 		}
-		if(wi.world.WorldGroup.Team != this.wi.Team) {
+		if(entity.world.WorldGroup.Team != this.entity.Team) {
 			// conquer the planet!
 			if(x.isRobot) {
-				return (x.wi.Team != this.wi.Team);
+				return (x.entity.Team != this.entity.Team);
 			}
 			else {
 				return false;
@@ -301,14 +300,14 @@ public class Robot : MonoBehaviour {
 		else {
 			// only attack no-team robots
 			if(x.isRobot) {
-				return (x.wi.Team != this.wi.Team);
+				return (x.entity.Team != this.entity.Team);
 			}
 			// assume rest is mining
 			// neutral team does not mine
-			if(this.wi.Team == Team.NEUTRAL) {
+			if(this.entity.Team == Team.NEUTRAL) {
 				return false;
 			}
-			return wi.world.AllowMining;
+			return entity.world.AllowMining;
 		}
 	}
 
@@ -320,8 +319,9 @@ public class Robot : MonoBehaviour {
 		desintegrateActionReselectCooldown -= Time.deltaTime;
 		if(desintegrateCooldown <= 0) {
 			// find hightest value
-			laserTarget = wi.world
-				.FindTopObjects<Destroyable>(this.transform.position, searchRadius)
+			laserTarget = entity.world
+				.FindTopObjects(this.transform.position, searchRadius)
+				.Select(e => e.destroyable)
 				.Where(ValidDesintegrateDestroyable)
 				.FindBest(this.transform.position, x => x.dropAmount);
 			desintegrateActionReselectCooldown = FIND_TOP_OBJS_COOLDOWN * MathTools.Random(0.80f,1.25f);
@@ -398,7 +398,7 @@ public class Robot : MonoBehaviour {
 		// move to goal
 		heading = Mathf.Atan2(dir.x,dir.z) * Mathf.Rad2Deg;
 		Vector3 newpos = this.transform.localPosition + Time.deltaTime * speed * dir.normalized;
-		if(falling.TrySetNewLocalPosition(newpos)) {
+		if(entity.falling.TrySetNewLocalPosition(newpos)) {
 			//newpos.y = topVoxel.z + 1.5f;
 			goal.y = newpos.y;
 			SetRotation(heading);

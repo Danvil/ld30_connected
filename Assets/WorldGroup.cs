@@ -57,9 +57,9 @@ public class WorldGroup : MonoBehaviour {
 			// count robots
 			int numRed = 0, numBlue = 0, numNeutral = 0;
 			foreach(var r in World.FindRobots()) {
-				if(r.wi.Team == Team.RED) numRed ++;
-				if(r.wi.Team == Team.BLUE) numBlue ++;
-				if(r.wi.Team == Team.NEUTRAL) numNeutral ++;
+				if(r.entity.Team == Team.RED) numRed ++;
+				if(r.entity.Team == Team.BLUE) numBlue ++;
+				if(r.entity.Team == Team.NEUTRAL) numNeutral ++;
 			}
 			// balance
 			int total = numRed + numBlue + numNeutral;

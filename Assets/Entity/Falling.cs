@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(WorldItem))]
+[RequireComponent(typeof(Entity))]
 public class Falling : MonoBehaviour {
 
-	WorldItem wi;
+	public Entity entity { get; private set; }
 
 	public bool forceHeight = false;
 	public float baseHeight = 0.0f;
@@ -18,13 +18,14 @@ public class Falling : MonoBehaviour {
 
 	void ComputeTopVoxel()
 	{
-		wi.world.Voxels.TryGetTopVoxel(this.transform.localPosition.ToInt3(), out topVoxel);
+		if(!entity.world) return;
+		entity.world.Voxels.TryGetTopVoxel(this.transform.localPosition.ToInt3(), out topVoxel);
 	}
 
 	public bool TrySetNewLocalPosition(Vector3 pos)
 	{
 		Int3 newTopVoxel;
-		if(wi.world.Voxels.TryGetTopVoxel(pos.ToInt3(), out newTopVoxel)) {
+		if(entity.world.Voxels.TryGetTopVoxel(pos.ToInt3(), out newTopVoxel)) {
 			// safe
 			topVoxel = newTopVoxel;
 			this.transform.localPosition = pos;
@@ -44,7 +45,8 @@ public class Falling : MonoBehaviour {
 
 	void Awake()
 	{
-		wi = GetComponent<WorldItem>();
+		entity = GetComponent<Entity>();
+		entity.falling = this;
 	}
 
 	// Use this for initialization
@@ -65,7 +67,7 @@ public class Falling : MonoBehaviour {
 		if(IsFalling) {
 			// fall down
 			pos += Time.deltaTime * velocity;
-			velocity += Time.deltaTime * wi.world.gravity;
+			velocity += Time.deltaTime * entity.world.gravity;
 			// check if we fall to death
 			if(pos.y < DEATH_HEIGHT) {
 				Destroy(gameObject);

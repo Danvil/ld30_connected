@@ -23,7 +23,7 @@ public class Factory : MonoBehaviour {
 	// Use this for initialization
 	void Start()
 	{
-		world = this.GetComponent<WorldItem>().world;
+		world = this.GetComponent<Entity>().world;
 	}
 	
 	// Update is called once per frame
@@ -64,7 +64,7 @@ public class Factory : MonoBehaviour {
 		// let loose
 		construct.transform.localPosition = exitPoint;
 		construct.transform.parent = world.transform;
-		WorldItem wi = construct.GetComponent<WorldItem>();
+		Entity wi = construct.GetComponent<Entity>();
 		wi.MoveToWorld(world);
 		wi.Team = world.WorldGroup.Team;
 		foreach(var s in construct.GetComponents<MonoBehaviour>()) {

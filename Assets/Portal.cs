@@ -26,12 +26,12 @@ public class Portal : MonoBehaviour {
 		var w = WorldGroup.World;
 		Robot robot = w
 			.FindRobots()
-			.Where(r => r.wi.Team == team && r.robType == rt)
+			.Where(r => r.entity.Team == team && r.robType == rt)
 			.RandomSample();
 		if(!robot) {
 			return;
 		}
-		robot.GetComponent<WorldItem>().MoveToSpace();
+		robot.GetComponent<Entity>().MoveToSpace();
 		System.Action<Robot> final = r => {
 			robots[rt].Add(robot);
 			UpdateNumText(rt);
@@ -48,7 +48,7 @@ public class Portal : MonoBehaviour {
 	public void MoveDown(Team team, RobType rt)
 	{
 		Robot robot = robots[rt]
-			.Where(r => r.wi.Team == team)
+			.Where(r => r.entity.Team == team)
 			.RandomSample();
 		if(!robot) {
 			return;
@@ -56,7 +56,7 @@ public class Portal : MonoBehaviour {
 		robots[rt].Remove(robot);
 		UpdateNumText(rt);
 		System.Action<Robot> final = r => {
-			robot.GetComponent<WorldItem>().MoveToWorld(WorldGroup.World);
+			robot.GetComponent<Entity>().MoveToWorld(WorldGroup.World);
 		};
 		StartCoroutine("Beam", 
 			new object[3]{ robot, transform.position + swirlPoint, final});

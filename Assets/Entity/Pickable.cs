@@ -7,7 +7,10 @@ public enum PickableType
 	MINERALS
 }
 
+[RequireComponent(typeof(Entity))]
 public class Pickable : MonoBehaviour {
+
+	public Entity entity { get; private set; }
 
 	public PickableType type;
 
@@ -30,6 +33,12 @@ public class Pickable : MonoBehaviour {
 	public float AmountPercent
 	{
 		get { return Amount / maxAmount; }
+	}
+
+	void Awake()
+	{
+		entity = GetComponent<Entity>();
+		entity.pickable = this;
 	}
 
 	// Use this for initialization

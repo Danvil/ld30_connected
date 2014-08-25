@@ -36,19 +36,19 @@ public class World : MonoBehaviour {
 		}
 	}
 
-	List<WorldItem> objects = new List<WorldItem>();
+	List<Entity> entities = new List<Entity>();
 
 
 	public IEnumerable<Robot> FindRobots()
 	{
-		return objects
-			.Select(x => x.GetComponent<Robot>())
-			.Where(x => x != null);
+		return entities
+			.Select(e => e.robot)
+			.Where(r => r != null);
 	}
 
-	public IEnumerable<WorldItem> FindTopObjects(Vector3 pos, float r)
+	public IEnumerable<Entity> FindTopObjects(Vector3 pos, float r)
 	{
-		foreach(var x in objects) {
+		foreach(var x in entities) {
 			if((x.transform.position - pos).magnitude >= r) {
 				continue;
 			}
@@ -59,26 +59,24 @@ public class World : MonoBehaviour {
 		}
 	}
 
-	public IEnumerable<T> FindTopObjects<T>(Vector3 pos, float r) where T : Component
-	{
-		foreach(var x in objects) {
-			T t = x.GetComponent<T>();
-			if(t == null) {
-				continue;
-			}
-			if((x.transform.position - pos).magnitude >= r) {
-				continue;
-			}
-			if(!Voxels.IsTopVoxelOrHigher(x.transform.position.ToInt3())) {
-				continue;
-			}
-			yield return t;
-		}
-	}
-
+	// public IEnumerable<T> FindTopObjects<T>(Vector3 pos, float r) where T : Component
+	// {
+	// 	foreach(var x in entities) {
+	// 		T t = x.GetComponent<T>();
+	// 		if(t == null) {
+	// 			continue;
+	// 		}
+	// 		if((x.transform.position - pos).magnitude >= r) {
+	// 			continue;
+	// 		}
+	// 		if(!Voxels.IsTopVoxelOrHigher(x.transform.position.ToInt3())) {
+	// 			continue;
+	// 		}
+	// 		yield return t;
+	// 	}
+	// }
 
 	public WorldGroup WorldGroup { get; set; }
-
 
 	public GameObject Building { get; private set; }
 
@@ -104,7 +102,7 @@ public class World : MonoBehaviour {
 		int h = Voxels.GetTopVoxelHeight(Int3.Zero);
 		Building.transform.parent = this.transform;
 		Building.transform.localPosition = new Vector3(0,h+1,0);
-		Add(Building.GetComponent<WorldItem>());
+		Add(Building.GetComponent<Entity>());
 	}
 
 	public bool AllowProduction { get; private set; }
@@ -121,15 +119,15 @@ public class World : MonoBehaviour {
 		AllowMining = v;
 	}
 
-	public void Add(WorldItem wi)
+	public void Add(Entity wi)
 	{
 		wi.world = this;
-		objects.Add(wi);
+		entities.Add(wi);
 	}
 
-	public void Remove(WorldItem wi)
+	public void Remove(Entity wi)
 	{
-		objects.Remove(wi);
+		entities.Remove(wi);
 		wi.world = null;
 	}
 
@@ -143,28 +141,28 @@ public class World : MonoBehaviour {
 			GameObject go = (GameObject)Instantiate(pfMineral);
 			go.transform.parent = this.transform;
 			go.transform.localPosition = p.ToVector3() + new Vector3(0.5f,0.5f,0.5f);
-			Add(go.GetComponent<WorldItem>());
+			Add(go.GetComponent<Entity>());
 		}
 		// plant small minerals in every top voxel
 		foreach(Int3 p in Voxels.GetTopVoxels()) {
 			GameObject go = (GameObject)Instantiate(pfMineralVoxel);
 			go.transform.parent = this.transform;
 			go.transform.localPosition = p.ToVector3() + new Vector3(0.5f,0.5f,0.5f);
-			Add(go.GetComponent<WorldItem>());
+			Add(go.GetComponent<Entity>());
 		}
 		// third pass plants
 		// plant 40 plants on top of random solid top voxels
 		foreach(Int3 p in Voxels.GetTopVoxels().RandomSample(numPlants)) {
 			GameObject go = (GameObject)Instantiate(pfPlant);
 			go.transform.parent = this.transform;
-			Add(go.GetComponent<WorldItem>());
+			Add(go.GetComponent<Entity>());
 			go.GetComponent<Falling>().SetNewLocalPosition(p.ToVector3() + new Vector3(0.5f,1,0.5f));
 		}
 		// robot laser
 		foreach(Int3 p in Voxels.GetTopVoxels().RandomSample(numRobotsLaser)) {
 			GameObject go = (GameObject)Instantiate(pfRobotLaser);
 			go.transform.parent = this.transform;
-			WorldItem wi = go.GetComponent<WorldItem>();
+			Entity wi = go.GetComponent<Entity>();
 			wi.MoveToWorld(this);
 			wi.Team = initRobotTeam;
 			go.GetComponent<Falling>().SetNewLocalPosition(p.ToVector3() + new Vector3(0.5f,1,0.5f));
@@ -175,7 +173,7 @@ public class World : MonoBehaviour {
 		foreach(Int3 p in Voxels.GetTopVoxels().RandomSample(numRobotsHauler)) {
 			GameObject go = (GameObject)Instantiate(pfRobotHauler);
 			go.transform.parent = this.transform;
-			WorldItem wi = go.GetComponent<WorldItem>();
+			Entity wi = go.GetComponent<Entity>();
 			wi.MoveToWorld(this);
 			wi.Team = initRobotTeam;
 			go.GetComponent<Falling>().SetNewLocalPosition(p.ToVector3() + new Vector3(0.5f,1,0.5f));
@@ -194,7 +192,7 @@ public class World : MonoBehaviour {
 		GameObject go = (GameObject)Instantiate(pfMineralVoxel);
 		go.transform.parent = this.transform;
 		go.transform.localPosition = (v - Int3.Z).ToVector3() + new Vector3(0.5f,0.5f,0.5f);
-		Add(go.GetComponent<WorldItem>());
+		Add(go.GetComponent<Entity>());
 	}
 
 	public Team initRobotTeam = Team.NEUTRAL;

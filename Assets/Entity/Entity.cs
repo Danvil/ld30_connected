@@ -1,9 +1,27 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class WorldItem : MonoBehaviour {
+public class Entity : MonoBehaviour {
 
 	public World world;
+
+	public Robot robot;
+	public Falling falling;
+	public Pickable pickable;
+	public Destroyable destroyable;
+
+	private Team team;
+
+	public Team Team {
+		get { return team; }
+		set
+		{
+			team = value;
+			if(robot) {
+				robot.UpdateTeamColor();
+			}
+		}
+	}
 
 	public void MoveToSpace()
 	{
@@ -29,20 +47,6 @@ public class WorldItem : MonoBehaviour {
 		var robot = GetComponent<Robot>();
 		if(robot) {
 			robot.SetRandomGoal();
-		}
-	}
-
-	private Team team;
-
-	public Team Team {
-		get { return team; }
-		set
-		{
-			team = value;
-			Robot r = GetComponent<Robot>();
-			if(r) {
-				r.UpdateTeamColor();
-			}
 		}
 	}
 

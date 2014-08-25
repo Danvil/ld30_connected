@@ -59,23 +59,6 @@ public class World : MonoBehaviour {
 		}
 	}
 
-	// public IEnumerable<T> FindTopObjects<T>(Vector3 pos, float r) where T : Component
-	// {
-	// 	foreach(var x in entities) {
-	// 		T t = x.GetComponent<T>();
-	// 		if(t == null) {
-	// 			continue;
-	// 		}
-	// 		if((x.transform.position - pos).magnitude >= r) {
-	// 			continue;
-	// 		}
-	// 		if(!Voxels.IsTopVoxelOrHigher(x.transform.position.ToInt3())) {
-	// 			continue;
-	// 		}
-	// 		yield return t;
-	// 	}
-	// }
-
 	public WorldGroup WorldGroup { get; set; }
 
 	public GameObject Building { get; private set; }

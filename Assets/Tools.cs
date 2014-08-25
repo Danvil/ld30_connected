@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-public static class MathTools
+public static class Tools
 {
 	public static Transform Search(this Transform target, string name)
 	{

@@ -214,7 +214,7 @@ public class Robot : MonoBehaviour {
 				.Select(e => e.pickable)
 				.Where(x => x != null && !x.Depleted)
 				.FindBest(this.transform.position, t => trunk.MaxCanLoad(t));
-			actionHaulReselectCooldown = FIND_TOP_OBJS_COOLDOWN * MathTools.Random(0.80f,1.25f);
+			actionHaulReselectCooldown = FIND_TOP_OBJS_COOLDOWN * Tools.Random(0.80f,1.25f);
 		}
 		else {
 			haulTarget = null;
@@ -324,7 +324,7 @@ public class Robot : MonoBehaviour {
 				.Select(e => e.destroyable)
 				.Where(ValidDesintegrateDestroyable)
 				.FindBest(this.transform.position, x => x.dropAmount);
-			desintegrateActionReselectCooldown = FIND_TOP_OBJS_COOLDOWN * MathTools.Random(0.80f,1.25f);
+			desintegrateActionReselectCooldown = FIND_TOP_OBJS_COOLDOWN * Tools.Random(0.80f,1.25f);
 		}
 		else {
 			laserTarget = null;
@@ -414,8 +414,8 @@ public class Robot : MonoBehaviour {
 	public bool ActionSetRandomGoal()
 	{
 		// move randomly
-		Vector3 dir = new Vector3(MathTools.Random(-1.00f,+1.00f), 0, MathTools.Random(-1.00f,+1.00f));
-		goal = this.transform.position + MathTools.Random(2.00f,4.00f)*dir.normalized;
+		Vector3 dir = new Vector3(Tools.Random(-1.00f,+1.00f), 0, Tools.Random(-1.00f,+1.00f));
+		goal = this.transform.position + Tools.Random(2.00f,4.00f)*dir.normalized;
 		return true;
 	}
 

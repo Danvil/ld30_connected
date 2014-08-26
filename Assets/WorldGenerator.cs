@@ -125,9 +125,10 @@ public class WorldGenerator : MonoBehaviour
 		foreach(Int3 p in voxels.GetTopVoxels().RandomSample(numPlants)) {
 			GameObject go = (GameObject)Instantiate(pfPlant);
 			go.transform.parent = world.transform;
-			world.Add(go.GetComponent<Entity>());
-			go.GetComponent<Falling>().SetNewLocalPosition(p.ToVector3() + new Vector3(0.5f,1,0.5f));
-			go.GetComponent<Growing>().Growth = Tools.Random(0.4f, 1.1f);
+			Entity e = go.GetComponent<Entity>();
+			e.MoveToWorld(world);
+			e.falling.SetNewLocalPosition(p.ToVector3() + new Vector3(0.5f,1,0.5f));
+			e.growing.Growth = Tools.Random(0.4f, 1.1f);
 		}
 	}
 

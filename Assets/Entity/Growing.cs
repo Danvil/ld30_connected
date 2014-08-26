@@ -23,6 +23,7 @@ public class Growing : MonoBehaviour {
 		Growth = 0.0f;
 		Entity = GetComponent<Entity>();
 		Entity.growing = this;
+		this.transform.localRotation *= Quaternion.AngleAxis(Tools.Random(0,360), Vector3.up);
 	}
 
 	bool CanReplicate()

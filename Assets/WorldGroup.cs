@@ -22,7 +22,6 @@ public class WorldGroup : MonoBehaviour {
 	{ 
 		get { return _team; }
 		set {
-			if(_team == value) return;
 			_team = value;
 			gui.SetTeam(_team);
 		}

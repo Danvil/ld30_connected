@@ -6,6 +6,8 @@ public class WorldInterface : MonoBehaviour {
 	public World world;
 
 	UnityEngine.UI.Text txtName;
+	UnityEngine.UI.Button btnFactory;
+	UnityEngine.UI.Button btnDriller;
 	UnityEngine.UI.Toggle tglProduction;
 	UnityEngine.UI.Toggle tglMining;
 
@@ -17,6 +19,11 @@ public class WorldInterface : MonoBehaviour {
 	public void SetTeam(Team team)
 	{
 		txtName.color = Globals.Singleton.TeamColor(team);
+		bool isPlayer = (team == Globals.Singleton.playerTeam);
+		btnFactory.interactable = isPlayer;
+		btnDriller.interactable = isPlayer;
+		tglProduction.interactable = isPlayer;
+		tglMining.interactable = isPlayer;
 	}
 	
 	public void BuildFactory()
@@ -45,10 +52,10 @@ public class WorldInterface : MonoBehaviour {
 		
 		txtName = this.transform.Search("TextName").GetComponent<UnityEngine.UI.Text>();
 
-		var btnFactory = this.transform.Search("ButtonFactory").GetComponent<UnityEngine.UI.Button>();
+		btnFactory = this.transform.Search("ButtonFactory").GetComponent<UnityEngine.UI.Button>();
 		btnFactory.onClick.AddListener(BuildFactory);
 
-		var btnDriller = this.transform.Search("ButtonDriller").GetComponent<UnityEngine.UI.Button>();
+		btnDriller = this.transform.Search("ButtonDriller").GetComponent<UnityEngine.UI.Button>();
 		btnDriller.onClick.AddListener(BuildDriller);
 
 		tglProduction = this.transform.Search("ToggleProduction").GetComponent<UnityEngine.UI.Toggle>();

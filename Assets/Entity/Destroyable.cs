@@ -43,11 +43,16 @@ public class Destroyable : MonoBehaviour {
 	void Update()
 	{
 		if(Dead && !hasDropped) {
+			// compute amount
+			float amount = dropAmount;
+			if(entity.growing) {
+				amount *= entity.growing.Growth;
+			}
 			// create drop
 			GameObject go = (GameObject)Instantiate(pfDropping);
 			go.transform.parent = entity.world.transform;
 			go.transform.position = this.transform.position;
-			go.GetComponent<Pickable>().maxAmount = dropAmount;
+			go.GetComponent<Pickable>().maxAmount = amount;
 			entity.world.Add(go.GetComponent<Entity>());
 			// destroy voxel
 			if(destroyVoxel) {

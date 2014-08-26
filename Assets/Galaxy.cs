@@ -57,7 +57,7 @@ public class Galaxy : MonoBehaviour {
 		gen = GetComponent<WorldGenerator>();
 	}
 
-	WorldGroup CreateWorld(Vector3 pos, Team robotteam)
+	WorldGroup CreateWorldBasic(Vector3 pos)
 	{
 		GameObject go = (GameObject)Instantiate(pfWorld);
 		go.transform.position = pos;
@@ -65,7 +65,14 @@ public class Galaxy : MonoBehaviour {
 		wg.Team = Team.NEUTRAL;
 		wg.Name = string.Format("World {0}", worlds.Count + 1);
 		AddWorld(wg);
-		gen.Create(wg.World, robotteam);
+		return wg;
+	}
+
+	WorldGroup CreateWorld(Vector3 pos, Team robotteam)
+	{
+		var wg = CreateWorldBasic(pos);
+		gen.Create(wg.World);
+		gen.CreateRobots(wg.World, robotteam);
 		return wg;
 	}
 

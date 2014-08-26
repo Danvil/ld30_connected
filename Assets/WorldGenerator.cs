@@ -15,8 +15,12 @@ public class WorldGenerator : MonoBehaviour
 	public int worldHeight = 6;
 	public int numMinerals = 100;
 	public int numPlants = 50;
-	public int numRobotsLaser = 10;
-	public int numRobotsHauler = 5;
+
+	public int numRobotsPlayerLaser = 5;
+	public int numRobotsPlayerHauler = 3;
+
+	public int numRobotsNeutralMin = 3;
+	public int numRobotsNeutralMax = 7;
 
 	SLPerlinNoise.PerlinNoise3D perlin;
 
@@ -96,7 +100,7 @@ public class WorldGenerator : MonoBehaviour
 		return vw;
 	}
 
-	public void Create(World world, Team initRobotTeam)
+	public void Create(World world)
 	{
 		// first pass voxels
 		VoxelEngine.World voxels = CreateDiscworld(worldRadius, worldHeight);
@@ -124,13 +128,28 @@ public class WorldGenerator : MonoBehaviour
 			world.Add(go.GetComponent<Entity>());
 			go.GetComponent<Falling>().SetNewLocalPosition(p.ToVector3() + new Vector3(0.5f,1,0.5f));
 		}
+	}
+
+	public void CreateRobots(World world, Team team)
+	{
+		if(team == Team.NEUTRAL) {
+			CreateRobots(world, team, 0, Tools.Random(numRobotsNeutralMin, numRobotsNeutralMax));
+		}
+		else {
+			CreateRobots(world, team, numRobotsPlayerHauler, numRobotsPlayerLaser);
+		}
+	}
+
+	public void CreateRobots(World world, Team team, int numRobotsHauler, int numRobotsLaser)
+	{
+		var voxels = world.Voxels;
 		// robot laser
 		foreach(Int3 p in voxels.GetTopVoxels().RandomSample(numRobotsLaser)) {
 			GameObject go = (GameObject)Instantiate(pfRobotLaser);
 			go.transform.parent = world.transform;
 			Entity wi = go.GetComponent<Entity>();
 			wi.MoveToWorld(world);
-			wi.Team = initRobotTeam;
+			wi.Team = team;
 			go.GetComponent<Falling>().SetNewLocalPosition(p.ToVector3() + new Vector3(0.5f,1,0.5f));
 			Robot rob =	go.GetComponent<Robot>();
 			rob.SetRandomGoal();
@@ -141,7 +160,7 @@ public class WorldGenerator : MonoBehaviour
 			go.transform.parent = world.transform;
 			Entity wi = go.GetComponent<Entity>();
 			wi.MoveToWorld(world);
-			wi.Team = initRobotTeam;
+			wi.Team = team;
 			go.GetComponent<Falling>().SetNewLocalPosition(p.ToVector3() + new Vector3(0.5f,1,0.5f));
 			Robot rob =	go.GetComponent<Robot>();
 			rob.SetRandomGoal();

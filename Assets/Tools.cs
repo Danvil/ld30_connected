@@ -66,6 +66,11 @@ public static class Tools
 		return random.Next(num);
 	}
 
+	public static int Random(int a, int b)
+	{
+		return random.Next(a,b);
+	}
+
 	public static float Random(float a, float b)
 	{
 		return a + (b - a)*UnityEngine.Random.value;

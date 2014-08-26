@@ -6,6 +6,7 @@ public class MeshData
 {
 	public List<Vector3> vertices = new List<Vector3>();
 	public List<Vector3> normals = new List<Vector3>();
+	public List<Vector2> uv = new List<Vector2>();
 	public List<Color> colors = new List<Color>();
 	public List<int> indices = new List<int>();
 
@@ -13,6 +14,7 @@ public class MeshData
 	{
 		vertices.Clear();
 		normals.Clear();
+		uv.Clear();
 		colors.Clear();
 		indices.Clear();
 	}
@@ -24,9 +26,10 @@ public class MeshData
 			vertices[i] = vertices[i].CoeffMult(scale);
 		}
 		mesh.vertices = vertices.ToArray();
-		mesh.triangles = indices.ToArray();
 		mesh.normals = normals.ToArray();
+		mesh.uv = uv.ToArray();
 		mesh.colors = colors.ToArray();
+		mesh.triangles = indices.ToArray();
 		//mesh.RecalculateNormals();
 		return mesh;
 	}

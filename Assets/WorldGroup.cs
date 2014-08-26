@@ -19,6 +19,16 @@ public class WorldGroup : MonoBehaviour {
 
 	public Team Team { get; set; }
 
+	string worldName;
+	public string Name
+	{
+		get { return worldName; }
+		set {
+			worldName = value;
+			gui.SetName(worldName);
+		}
+	}
+
 	public Color AllegianceColor
 	{
 		get

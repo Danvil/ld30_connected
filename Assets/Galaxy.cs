@@ -60,6 +60,7 @@ public class Galaxy : MonoBehaviour {
 		go.transform.position = pos;
 		WorldGroup wg = go.GetComponent<WorldGroup>();
 		wg.Team = Team.NEUTRAL;
+		wg.Name = string.Format("World {0}", worlds.Count + 1);
 		AddWorld(wg);
 		return wg;
 	}

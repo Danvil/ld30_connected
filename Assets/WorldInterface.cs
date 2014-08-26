@@ -14,6 +14,11 @@ public class WorldInterface : MonoBehaviour {
 		txtName.text = name;
 	}
 
+	public void SetTeam(Team team)
+	{
+		txtName.color = Globals.Singleton.TeamColor(team);
+	}
+	
 	public void BuildFactory()
 	{
 		world.BuildFactory();

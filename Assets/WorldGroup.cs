@@ -17,7 +17,16 @@ public class WorldGroup : MonoBehaviour {
 
 	public float Allegiance { get; private set; }
 
-	public Team Team { get; set; }
+	Team _team;
+	public Team Team
+	{ 
+		get { return _team; }
+		set {
+			if(_team == value) return;
+			_team = value;
+			gui.SetTeam(_team);
+		}
+	}
 
 	string worldName;
 	public string Name

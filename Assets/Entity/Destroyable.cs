@@ -55,20 +55,20 @@ public class Destroyable : MonoBehaviour {
 				entity.world.DestroyVoxel(ip);
 			}
 			// start fading
-			StartCoroutine("Fade");
 			hasDropped = true;
+			StartCoroutine("Fade");
 		}
 	}
 
 	IEnumerator Fade() {
-		entity.MoveToSpace();
-		// stop all scripts
-		this.enabled = false;
 		// fade out
 		while(this.transform.localScale.magnitude > 0.1f) {
 			this.transform.localScale *= (1.0f - deadScaleDecayRate*Time.deltaTime);
 			yield return null;
 		}
+		// unlink from world
+		entity.MoveToSpace();
+		// finally destroy it completely
 		Destroy(this.gameObject);
 	}
 }

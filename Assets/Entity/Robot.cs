@@ -64,7 +64,9 @@ public class Robot : MonoBehaviour {
 	// Update is called once per frame
 	void Update()
 	{
-		if(!entity.world) {
+		if(!entity.world || entity.destroyable.Dead) {
+			if(laser) DesintegrateActionStop();
+			if(trunk) HaulActionCancel();
 			return;
 		}
 		// falling

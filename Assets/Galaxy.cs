@@ -106,24 +106,26 @@ public class Galaxy : MonoBehaviour {
 	WorldGroup TryPlace(List<WorldGroup> open, float size, float rmin, float rmax)
 	{
 		float sizefudge = size;
+		float minradfudge = rmin;
 		while(true) {
 			var wg = open.RandomSample();
 			float r = Tools.Random(rmin, rmax);
 			float a = Tools.Random(0, 2.0f*Mathf.PI);
 			Vector3 p = wg.transform.position + r * new Vector3(Mathf.Cos(a), 0, Mathf.Sin(a));
 			if(0 <= p.x && p.x <= sizefudge && 0 <= p.z && p.z <= sizefudge) {
-				if(!worlds.Any(x => (x.transform.position - p).magnitude < rmin)) {
+				if(!worlds.Any(x => (x.transform.position - p).magnitude < minradfudge)) {
 					return CreateWorld(p, Team.NEUTRAL);
 				}
 			}
 			sizefudge += 0.05f*size;
+			minradfudge = Mathf.Max(0.65f*rmin, minradfudge - 0.05f*rmin);
 		}
 	}
 
 	void GenerateGalaxyOrganic()
 	{
 		const int NUM = 2;
-		const float SIZE = 130.0f;
+		const float SIZE = 120.0f;
 		const float R_MIN = 55.0f;
 		const float R_MAX = 90.0f;
 

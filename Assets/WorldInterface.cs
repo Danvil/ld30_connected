@@ -79,6 +79,7 @@ public class WorldInterface : MonoBehaviour {
 	void Start () {
 		ToogleProduction(tglProduction.IsActive());
 		ToogleMining(tglMining.IsActive());
+		ToogleHarvesting(tglHarvesting.IsActive());
 	}
 	
 	// Update is called once per frame

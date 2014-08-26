@@ -75,19 +75,11 @@ public class World : MonoBehaviour {
 		Add(Building.GetComponent<Entity>());
 	}
 
-	public bool AllowProduction { get; private set; }
+	public bool AllowProduction { get; set; }
 
-	public void ToogleProduction(bool v)
-	{
-		AllowProduction = v;
-	}
+	public bool AllowMining { get; set; }
 
-	public bool AllowMining { get; private set; }
-
-	public void ToogleMining(bool v)
-	{
-		AllowMining = v;
-	}
+	public bool AllowHarvesting { get; set; }
 
 	public void Add(Entity wi)
 	{

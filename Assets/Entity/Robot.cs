@@ -309,7 +309,13 @@ public class Robot : MonoBehaviour {
 			if(this.entity.Team == Team.NEUTRAL) {
 				return false;
 			}
-			return entity.world.AllowMining;
+			//
+			if(x.entity.growing) {
+				return entity.world.AllowHarvesting;
+			}
+			else {
+				return entity.world.AllowMining;
+			}
 		}
 	}
 

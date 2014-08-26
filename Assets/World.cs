@@ -26,8 +26,8 @@ public class World : MonoBehaviour {
 
 	public Vector3 gravity = new Vector3(0,-9.81f,0);
 
-	Voxels.World voxels;
-	public Voxels.World Voxels
+	VoxelEngine.World voxels;
+	public VoxelEngine.World Voxels
 	{
 		get { return voxels; }
 		set {
@@ -167,10 +167,10 @@ public class World : MonoBehaviour {
 
 	public void DestroyVoxel(Int3 v)
 	{
-		if(Voxels.Get(v).solid == global::Voxels.Voxel.Solidness.Ultra) {
+		if(Voxels.Get(v).solid == VoxelEngine.Voxel.Solidness.Ultra) {
 			return;
 		}
-		Voxels.Set(v, global::Voxels.Voxel.Empty);
+		Voxels.Set(v, VoxelEngine.Voxel.Empty);
 		// place mineral for voxel below
 		GameObject go = (GameObject)Instantiate(pfMineralVoxel);
 		go.transform.parent = this.transform;

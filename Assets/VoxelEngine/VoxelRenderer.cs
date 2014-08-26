@@ -7,11 +7,11 @@ public class VoxelRenderer : MonoBehaviour
 {
 	public GameObject pfVoxelChunk;
 
-	Voxels.World world;
+	VoxelEngine.World world;
 
 	Dictionary<Int3,GameObject> chunks = new Dictionary<Int3,GameObject>();
 
-	public void SetWorld(Voxels.World world)
+	public void SetWorld(VoxelEngine.World world)
 	{
 		this.world = world;
 		Create();

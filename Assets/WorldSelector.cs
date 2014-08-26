@@ -42,7 +42,7 @@ public class WorldSelector : MonoBehaviour {
 		}
 		// center
 		if(Input.GetKeyDown(KeyCode.G)) {
-			Vector3 mp = Galaxy.Singleton.WorldsMeanPoint();
+			Vector3 mp = Galaxy.Singleton.GalaxyCenterPoint();
 			height = heightHigh;
 			float z = height * OneOverTanAlpha;
 			camera.transform.position = mp + new Vector3(0,height,-z);

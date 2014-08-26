@@ -44,7 +44,7 @@ public class Galaxy : MonoBehaviour {
 		} 
 	}
 
-	public Vector3 WorldsMeanPoint()
+	public Vector3 GalaxyCenterPoint()
 	{
 		return worlds.Select(w => w.World.transform.position).Aggregate((a,b)=>a+b) / (float)worlds.Count;
 	}

@@ -49,12 +49,15 @@ public class Galaxy : MonoBehaviour {
 		return worlds.Select(w => w.World.transform.position).Aggregate((a,b)=>a+b) / (float)worlds.Count;
 	}
 
+	WorldGenerator gen;
+	
 	void Awake()
 	{
 		Singleton = this;
+		gen = GetComponent<WorldGenerator>();
 	}
 
-	WorldGroup CreateWorld(Vector3 pos)
+	WorldGroup CreateWorld(Vector3 pos, Team robotteam)
 	{
 		GameObject go = (GameObject)Instantiate(pfWorld);
 		go.transform.position = pos;
@@ -62,13 +65,13 @@ public class Galaxy : MonoBehaviour {
 		wg.Team = Team.NEUTRAL;
 		wg.Name = string.Format("World {0}", worlds.Count + 1);
 		AddWorld(wg);
+		gen.Create(wg.World, robotteam);
 		return wg;
 	}
 
 	void GenerateGalaxyOne()
 	{
-		CreateWorld(Vector3.zero);
-		worlds[0].World.initRobotTeam = Globals.Singleton.playerTeam;		
+		CreateWorld(Vector3.zero, Globals.Singleton.playerTeam);
 	}
 
 	void GenerateGalaxySimple()
@@ -79,12 +82,12 @@ public class Galaxy : MonoBehaviour {
 		for(int y=0; y<2; y++) {
 			for(int x=0; x<2; x++) {
 				Vector3 pos = new Vector3(SPACE*x,0,SPACE*y) + SPACE * RND * new Vector3(Tools.Random(-1f,+1f),0,Tools.Random(-1f,+1f));
-				CreateWorld(pos);
+				Team team = Team.NEUTRAL;
+				if(x==0 && y==0) team = Team.BLUE;
+				if(x==1 && y==1) team = Team.RED;
+				CreateWorld(pos, team);
 			}
 		}
-
-		worlds[0].World.initRobotTeam = Globals.Singleton.playerTeam;
-		worlds[3].World.initRobotTeam = Globals.Singleton.nonPlayerTeam;
 
 		AddConnection(worlds[0], worlds[1]);
 		AddConnection(worlds[0], worlds[2]);
@@ -103,7 +106,7 @@ public class Galaxy : MonoBehaviour {
 			Vector3 p = wg.transform.position + r * new Vector3(Mathf.Cos(a), 0, Mathf.Sin(a));
 			if(0 <= p.x && p.x <= sizefudge && 0 <= p.z && p.z <= sizefudge) {
 				if(!worlds.Any(x => (x.transform.position - p).magnitude < rmin)) {
-					return CreateWorld(p);
+					return CreateWorld(p, Team.NEUTRAL);
 				}
 			}
 			sizefudge += 0.05f*size;
@@ -122,10 +125,8 @@ public class Galaxy : MonoBehaviour {
 		Vector3 pos2 = new Vector3(SIZE,0,SIZE);
 
 		// initial worlds
-		CreateWorld(pos1);
-		worlds[0].World.initRobotTeam = Globals.Singleton.playerTeam;
-		CreateWorld(pos2);
-		worlds[1].World.initRobotTeam = Globals.Singleton.nonPlayerTeam;
+		CreateWorld(pos1, Globals.Singleton.playerTeam);
+		CreateWorld(pos2, Globals.Singleton.nonPlayerTeam);
 
 		// grow galaxy
 		List<WorldGroup> open1 = new List<WorldGroup>();

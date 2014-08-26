@@ -6,23 +6,10 @@ using System.Linq;
 [RequireComponent(typeof(VoxelRenderer))]
 public class World : MonoBehaviour {
 
-	static WorldVoxelGenerator gen = new WorldVoxelGenerator();
+	public GameObject pfMineralVoxel;
 
 	public GameObject pfFactory;
 	public GameObject pfDriller;
-
-	public GameObject pfMineral;
-	public GameObject pfMineralVoxel;
-	public GameObject pfPlant;
-	public GameObject pfRobotLaser;
-	public GameObject pfRobotHauler;
-
-	public int worldRadius = 16;
-	public int worldHeight = 6;
-	public int numMinerals = 100;
-	public int numPlants = 50;
-	public int numRobotsLaser = 10;
-	public int numRobotsHauler = 5;
 
 	public Vector3 gravity = new Vector3(0,-9.81f,0);
 
@@ -114,57 +101,6 @@ public class World : MonoBehaviour {
 		wi.world = null;
 	}
 
-	void Generate()
-	{
-		// first pass voxels
-		Voxels = gen.CreateDiscworld(worldRadius, worldHeight);
-		// second pass minerals
-		// plant 100 minerals in random solid voxels
-		foreach(Int3 p in Voxels.GetSolidVoxels().RandomSample(numMinerals)) {
-			GameObject go = (GameObject)Instantiate(pfMineral);
-			go.transform.parent = this.transform;
-			go.transform.localPosition = p.ToVector3() + new Vector3(0.5f,0.5f,0.5f);
-			Add(go.GetComponent<Entity>());
-		}
-		// plant small minerals in every top voxel
-		foreach(Int3 p in Voxels.GetTopVoxels()) {
-			GameObject go = (GameObject)Instantiate(pfMineralVoxel);
-			go.transform.parent = this.transform;
-			go.transform.localPosition = p.ToVector3() + new Vector3(0.5f,0.5f,0.5f);
-			Add(go.GetComponent<Entity>());
-		}
-		// third pass plants
-		// plant 40 plants on top of random solid top voxels
-		foreach(Int3 p in Voxels.GetTopVoxels().RandomSample(numPlants)) {
-			GameObject go = (GameObject)Instantiate(pfPlant);
-			go.transform.parent = this.transform;
-			Add(go.GetComponent<Entity>());
-			go.GetComponent<Falling>().SetNewLocalPosition(p.ToVector3() + new Vector3(0.5f,1,0.5f));
-		}
-		// robot laser
-		foreach(Int3 p in Voxels.GetTopVoxels().RandomSample(numRobotsLaser)) {
-			GameObject go = (GameObject)Instantiate(pfRobotLaser);
-			go.transform.parent = this.transform;
-			Entity wi = go.GetComponent<Entity>();
-			wi.MoveToWorld(this);
-			wi.Team = initRobotTeam;
-			go.GetComponent<Falling>().SetNewLocalPosition(p.ToVector3() + new Vector3(0.5f,1,0.5f));
-			Robot rob =	go.GetComponent<Robot>();
-			rob.SetRandomGoal();
-		}
-		// robot hauler
-		foreach(Int3 p in Voxels.GetTopVoxels().RandomSample(numRobotsHauler)) {
-			GameObject go = (GameObject)Instantiate(pfRobotHauler);
-			go.transform.parent = this.transform;
-			Entity wi = go.GetComponent<Entity>();
-			wi.MoveToWorld(this);
-			wi.Team = initRobotTeam;
-			go.GetComponent<Falling>().SetNewLocalPosition(p.ToVector3() + new Vector3(0.5f,1,0.5f));
-			Robot rob =	go.GetComponent<Robot>();
-			rob.SetRandomGoal();
-		}
-	}
-
 	public void DestroyVoxel(Int3 v)
 	{
 		if(Voxels.Get(v).solid == VoxelEngine.Voxel.Solidness.Ultra) {
@@ -178,11 +114,8 @@ public class World : MonoBehaviour {
 		Add(go.GetComponent<Entity>());
 	}
 
-	public Team initRobotTeam = Team.NEUTRAL;
-
 	// Use this for initialization
 	void Start () {
-		Generate();
 	}
 	
 	// Update is called once per frame

@@ -3,13 +3,26 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-public class WorldVoxelGenerator
+public class WorldGenerator : MonoBehaviour
 {
+	public GameObject pfMineral;
+	public GameObject pfMineralVoxel;
+	public GameObject pfPlant;
+	public GameObject pfRobotLaser;
+	public GameObject pfRobotHauler;
+
+	public int worldRadius = 16;
+	public int worldHeight = 6;
+	public int numMinerals = 100;
+	public int numPlants = 50;
+	public int numRobotsLaser = 10;
+	public int numRobotsHauler = 5;
+
 	SLPerlinNoise.PerlinNoise3D perlin;
 
 	VoxelEngine.Voxel vAir, vWater, vLand, vBedRock;
 		
-	public WorldVoxelGenerator()
+	public WorldGenerator()
 	{
 		perlin = new SLPerlinNoise.PerlinNoise3D(0);
 		vAir = VoxelEngine.Voxel.Empty;
@@ -81,6 +94,58 @@ public class WorldVoxelGenerator
 			vw.Set(i, vBedRock);
 		}
 		return vw;
+	}
+
+	public void Create(World world, Team initRobotTeam)
+	{
+		// first pass voxels
+		VoxelEngine.World voxels = CreateDiscworld(worldRadius, worldHeight);
+		world.Voxels = voxels;
+		// second pass minerals
+		// plant 100 minerals in random solid voxels
+		foreach(Int3 p in voxels.GetSolidVoxels().RandomSample(numMinerals)) {
+			GameObject go = (GameObject)Instantiate(pfMineral);
+			go.transform.parent = world.transform;
+			go.transform.localPosition = p.ToVector3() + new Vector3(0.5f,0.5f,0.5f);
+			world.Add(go.GetComponent<Entity>());
+		}
+		// plant small minerals in every top voxel
+		foreach(Int3 p in voxels.GetTopVoxels()) {
+			GameObject go = (GameObject)Instantiate(pfMineralVoxel);
+			go.transform.parent = world.transform;
+			go.transform.localPosition = p.ToVector3() + new Vector3(0.5f,0.5f,0.5f);
+			world.Add(go.GetComponent<Entity>());
+		}
+		// third pass plants
+		// plant 40 plants on top of random solid top voxels
+		foreach(Int3 p in voxels.GetTopVoxels().RandomSample(numPlants)) {
+			GameObject go = (GameObject)Instantiate(pfPlant);
+			go.transform.parent = world.transform;
+			world.Add(go.GetComponent<Entity>());
+			go.GetComponent<Falling>().SetNewLocalPosition(p.ToVector3() + new Vector3(0.5f,1,0.5f));
+		}
+		// robot laser
+		foreach(Int3 p in voxels.GetTopVoxels().RandomSample(numRobotsLaser)) {
+			GameObject go = (GameObject)Instantiate(pfRobotLaser);
+			go.transform.parent = world.transform;
+			Entity wi = go.GetComponent<Entity>();
+			wi.MoveToWorld(world);
+			wi.Team = initRobotTeam;
+			go.GetComponent<Falling>().SetNewLocalPosition(p.ToVector3() + new Vector3(0.5f,1,0.5f));
+			Robot rob =	go.GetComponent<Robot>();
+			rob.SetRandomGoal();
+		}
+		// robot hauler
+		foreach(Int3 p in voxels.GetTopVoxels().RandomSample(numRobotsHauler)) {
+			GameObject go = (GameObject)Instantiate(pfRobotHauler);
+			go.transform.parent = world.transform;
+			Entity wi = go.GetComponent<Entity>();
+			wi.MoveToWorld(world);
+			wi.Team = initRobotTeam;
+			go.GetComponent<Falling>().SetNewLocalPosition(p.ToVector3() + new Vector3(0.5f,1,0.5f));
+			Robot rob =	go.GetComponent<Robot>();
+			rob.SetRandomGoal();
+		}
 	}
 
 }

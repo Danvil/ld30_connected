@@ -31,7 +31,7 @@ public class WorldGenerator : MonoBehaviour
 		perlin = new SLPerlinNoise.PerlinNoise3D(0);
 		vAir = VoxelEngine.Voxel.Empty;
 		vWater = new VoxelEngine.Voxel(VoxelEngine.Voxel.Solidness.Soft, new Color(0.35f,0.50f,0.75f));
-		vLand = new VoxelEngine.Voxel(VoxelEngine.Voxel.Solidness.Normal, new Color(0.98f,0.98f,0.98f));
+		vLand = new VoxelEngine.Voxel(VoxelEngine.Voxel.Solidness.Normal, new Color(0.92f,0.92f,0.92f));
 		vBedRock = new VoxelEngine.Voxel(VoxelEngine.Voxel.Solidness.Ultra, new Color(0.21f,0.22f,0.22f));
 	}
 

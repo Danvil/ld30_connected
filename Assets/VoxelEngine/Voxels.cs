@@ -197,6 +197,26 @@ namespace VoxelEngine
 				chunks[c] = new Chunk(this, c);
 			}
 			chunks[c].Set(l,b);
+			// mark neighbours as dirty
+			Chunk chunk = null;
+			if(l.x == Chunk.S-1 && chunks.TryGetValue(c+Int3.X, out chunk)) {
+				chunk.Dirty = true;
+			}
+			if(l.x == 0 && chunks.TryGetValue(c-Int3.X, out chunk)) {
+				chunk.Dirty = true;
+			}
+			if(l.y == Chunk.S-1 && chunks.TryGetValue(c+Int3.Y, out chunk)) {
+				chunk.Dirty = true;
+			}
+			if(l.y == 0 && chunks.TryGetValue(c-Int3.Y, out chunk)) {
+				chunk.Dirty = true;
+			}
+			if(l.z == Chunk.S-1 && chunks.TryGetValue(c+Int3.Z, out chunk)) {
+				chunk.Dirty = true;
+			}
+			if(l.z == 0 && chunks.TryGetValue(c-Int3.Z, out chunk)) {
+				chunk.Dirty = true;
+			}
 		}
 
 		public Voxel Get(Int3 p)

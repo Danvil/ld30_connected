@@ -71,9 +71,27 @@ public static class Tools
 		return random.Next(a,b);
 	}
 
+	public static float Random01()
+	{
+		return UnityEngine.Random.value;
+	}
+
 	public static float Random(float a, float b)
 	{
 		return a + (b - a)*UnityEngine.Random.value;
+	}
+
+	public static Vector3 RandomInRing(float rmin, float rmax)
+	{
+		float a = Random(0, Mathf.PI);
+		float r = Random(rmin, rmax);
+		return r * new Vector3(Mathf.Cos(a), 0, Mathf.Sin(a));
+	}
+
+	public static bool PoissonTest(float a)
+	{
+		float p = 1.0f - Mathf.Exp(-a);
+		return Random01() <= p;
 	}
 
 	public static void ShuffleInplace<T>(this List<T> array)

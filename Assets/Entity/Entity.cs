@@ -9,6 +9,7 @@ public class Entity : MonoBehaviour {
 	public Falling falling;
 	public Pickable pickable;
 	public Destroyable destroyable;
+	public Growing growing;
 
 	private Team team;
 
@@ -25,6 +26,9 @@ public class Entity : MonoBehaviour {
 
 	public void MoveToSpace()
 	{
+		// counts
+		if(this.growing) this.world.WorldGroup.NumPlants--;
+		// move
 		this.transform.parent = null;
 		world.Remove(this);
 		world = null;
@@ -48,6 +52,8 @@ public class Entity : MonoBehaviour {
 		if(robot) {
 			robot.SetRandomGoal();
 		}
+		// counts
+		if(this.growing) this.world.WorldGroup.NumPlants++;
 	}
 
 	// Use this for initialization

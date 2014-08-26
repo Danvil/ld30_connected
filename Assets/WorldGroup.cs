@@ -17,6 +17,9 @@ public class WorldGroup : MonoBehaviour {
 
 	public float Allegiance { get; private set; }
 
+	public int numPlantsMax = 100;
+	public int NumPlants { get; set; }
+
 	Team _team;
 	public Team Team
 	{ 
@@ -117,6 +120,8 @@ public class WorldGroup : MonoBehaviour {
 		Portal.WorldGroup = this;
 		gui = GetComponentInChildren<WorldInterface>();
 		gui.world = World;
+
+		NumPlants = 0;
 	}
 
 	// Use this for initialization

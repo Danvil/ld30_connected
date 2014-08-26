@@ -127,6 +127,7 @@ public class WorldGenerator : MonoBehaviour
 			go.transform.parent = world.transform;
 			world.Add(go.GetComponent<Entity>());
 			go.GetComponent<Falling>().SetNewLocalPosition(p.ToVector3() + new Vector3(0.5f,1,0.5f));
+			go.GetComponent<Growing>().Growth = Tools.Random(0.4f, 1.1f);
 		}
 	}
 

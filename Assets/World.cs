@@ -52,7 +52,7 @@ public class World : MonoBehaviour {
 			if((x.transform.position - pos).magnitude >= r) {
 				continue;
 			}
-			if(!Voxels.IsTopVoxelOrHigher(x.transform.position.ToInt3())) {
+			if(!x.falling && !Voxels.IsTopVoxelOrHigher(x.transform.position.ToInt3())) {
 				continue;
 			}
 			yield return x;

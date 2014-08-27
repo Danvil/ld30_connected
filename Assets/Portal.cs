@@ -15,6 +15,7 @@ public class Portal : MonoBehaviour {
 	public void SetColor(Color color)
 	{
 		this.GetComponentInChildren<Renderer>().material.color = 0.65f*color;
+		this.transform.Search("PSOuter").GetComponentInChildren<Renderer>().material.SetColor("_TintColor", 0.65f*color);
 	}
 
 	Dictionary<RobType,List<Robot>> robots = new Dictionary<RobType,List<Robot>>();

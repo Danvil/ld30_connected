@@ -18,7 +18,22 @@ public class Pickable : MonoBehaviour {
 
 	public float skewValue = 1.0f;
 
-	public float Amount { get; set; }
+	public float _amount;
+	public float Amount
+	{
+		get { return _amount; }
+		set {
+			_amount = value;
+			// update scale
+			float scl1 = Mathf.Sqrt(0.3f*maxAmount);
+			float scl2 = 0.2f + 0.8f*Mathf.Sqrt(AmountPercent);
+			this.transform.localScale = scl1 * scl2 * baseScale;
+			// check if depleted
+			if(Depleted) {
+				Destroy(gameObject);
+			}
+		}
+	}
 
 	public float Gather(float x)
 	{
@@ -38,7 +53,7 @@ public class Pickable : MonoBehaviour {
 	}
 
 	Vector3 baseScale = Vector3.one;
-
+	
 	void Awake()
 	{
 		entity = GetComponent<Entity>();
@@ -59,11 +74,5 @@ public class Pickable : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		float scl1 = Mathf.Sqrt(0.3f*maxAmount);
-		float scl2 = 0.2f + 0.8f*Mathf.Sqrt(AmountPercent);
-		this.transform.localScale = scl1 * scl2 * baseScale;
-		if(Depleted) {
-			Destroy(gameObject);
-		}
 	}
 }

@@ -10,7 +10,7 @@ public class Robot : MonoBehaviour {
 
 	public Entity entity { get; private set; }
 
-	const float FIND_TOP_OBJS_COOLDOWN = 0.40f;
+	const float FIND_TOP_OBJS_COOLDOWN = 0.30f;
 
 	public float speed = 1.70f;
 	public float distToGoal = 0.07f;
@@ -212,7 +212,8 @@ public class Robot : MonoBehaviour {
 		if(actionHaulReselectCooldown < 0.0f) {
 			// find hightest value
 			haulTarget = entity.world
-				.FindTopObjects(this.transform.position, searchRadius)
+				//.FindTopObjects(this.transform.position, searchRadius)
+				.FindTopObjects()
 				.Select(e => e.pickable)
 				.Where(x => x != null && !x.Depleted)
 				.FindBest(this.transform.position, t => trunk.MaxCanLoad(t));
@@ -280,8 +281,8 @@ public class Robot : MonoBehaviour {
 	}
 
 	public float miningLowThreshold = 0.50f;
-	public float miningLowProbIncRate = 0.35f;
-	public float miningLowPause = 1.70f;
+	public float miningLowProbIncRate = 0.12f;
+	public float miningLowBreakProb = 0.25f;
 
 	float lowMineProb = 0.0f;
 
@@ -331,7 +332,7 @@ public class Robot : MonoBehaviour {
 				.FindTopObjects(this.transform.position, searchRadius)
 				.Select(e => e.destroyable)
 				.Where(ValidDesintegrateDestroyable)
-				.FindBest(this.transform.position, x => x.dropAmount);
+				.FindBest(this.transform.position, x => x.dropAmount + x.transform.position.y);
 			desintegrateActionReselectCooldown = FIND_TOP_OBJS_COOLDOWN * Tools.Random(0.80f,1.25f);
 		}
 		else {
@@ -348,16 +349,18 @@ public class Robot : MonoBehaviour {
 		}
 		else {
 			lowMineProb += Time.deltaTime * miningLowProbIncRate;
-			if(desintegrateCooldown > 0) {
+			if(!Tools.ProbabilityTest(lowMineProb)) {
 				laserTarget = null;
 				return false;
 			}
-			if(Random.value > Mathf.Min(0.95f,lowMineProb)) {
-				desintegrateCooldown = miningLowPause;
+			if(Tools.PoissonTest(Time.deltaTime, miningLowBreakProb)) {
+				lowMineProb = 0.0f;
 				laserTarget = null;
 				return false;
 			}
-			return true;
+			else {
+				return true;
+			}
 		}
 	}
 

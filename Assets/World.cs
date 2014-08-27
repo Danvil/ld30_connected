@@ -11,6 +11,9 @@ public class World : MonoBehaviour {
 	public GameObject pfFactory;
 	public GameObject pfDriller;
 
+	public int maxPickables = 100;
+	public int maxRobots = 20;
+
 	public Vector3 gravity = new Vector3(0,-9.81f,0);
 
 	VoxelEngine.World voxels;
@@ -39,7 +42,17 @@ public class World : MonoBehaviour {
 			if((x.transform.position - pos).magnitude >= r) {
 				continue;
 			}
-			if(!x.falling && !Voxels.IsTopVoxelOrHigher(x.transform.position.ToInt3())) {
+			if(!x.falling && !x.pickable && !Voxels.IsTopVoxelOrHigher(x.transform.position.ToInt3())) {
+				continue;
+			}
+			yield return x;
+		}
+	}
+
+	public IEnumerable<Entity> FindTopObjects()
+	{
+		foreach(var x in entities) {
+			if(!x.falling && !x.pickable && !Voxels.IsTopVoxelOrHigher(x.transform.position.ToInt3())) {
 				continue;
 			}
 			yield return x;
@@ -75,9 +88,21 @@ public class World : MonoBehaviour {
 		Add(Building.GetComponent<Entity>());
 	}
 
-	public bool AllowProduction { get; set; }
+	bool _allowProduction;
+	bool _allowProductionMaxNotReached = true;
+	public bool AllowProduction
+	{
+		get { return _allowProduction && _allowProductionMaxNotReached; }
+		set { _allowProduction = true; }
+	}
 
-	public bool AllowMining { get; set; }
+	bool _allowMining;
+	bool _allowMiningMaxNotReached = true;
+	public bool AllowMining
+	{
+		get { return _allowMining && _allowMiningMaxNotReached; }
+		set { _allowMining = true; }
+	}
 
 	public bool AllowHarvesting { get; set; }
 
@@ -85,12 +110,22 @@ public class World : MonoBehaviour {
 	{
 		wi.world = this;
 		entities.Add(wi);
+		UpdateAllowMiningMaxNotReached();
 	}
 
 	public void Remove(Entity wi)
 	{
 		entities.Remove(wi);
 		wi.world = null;
+		UpdateAllowMiningMaxNotReached();
+	}
+
+	void UpdateAllowMiningMaxNotReached()
+	{
+		int curr1 = entities.Select(x => x.pickable).Where(x => x != null).Count();
+		_allowMiningMaxNotReached = (curr1 <= maxPickables);
+		int curr2 = entities.Select(x => x.robot).Where(x => x != null && x.entity.Team == WorldGroup.Team).Count();
+		_allowProductionMaxNotReached = (curr2 <= maxRobots);
 	}
 
 	public void DestroyVoxel(Int3 v)

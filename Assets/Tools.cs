@@ -88,10 +88,20 @@ public static class Tools
 		return r * new Vector3(Mathf.Cos(a), 0, Mathf.Sin(a));
 	}
 
-	public static bool PoissonTest(float a)
+	public static bool ProbabilityTest(float p)
 	{
-		float p = 1.0f - Mathf.Exp(-a);
 		return Random01() <= p;
+	}
+
+	public static bool PoissonTest(float occurence)
+	{
+		float p = 1.0f - Mathf.Exp(-occurence);
+		return ProbabilityTest(p);
+	}
+
+	public static bool PoissonTest(float dt, float rate)
+	{
+		return PoissonTest(dt * rate);
 	}
 
 	public static void ShuffleInplace<T>(this List<T> array)
